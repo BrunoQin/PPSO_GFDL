@@ -15,35 +15,19 @@ public class FileHelper {
 
     private static final String fileName = "D:\\github\\PPSO_GFDL\\src\\main\\resources\\ocean_temp_salt.res.nc";
     private static final String newName = "D:\\github\\PPSO_GFDL\\src\\main\\resources\\ocean_temp_salt_";
+    private static final String PARAMETER = "temp";
 
     /**
      * 将原文件拷贝成新文件，并将粒子矩阵写回新文件
      * @param order
-     * @param matrix
+     * @param swarm
      * @return
      */
-    public static String prepareFile(int order, Matrix matrix){
+    public static String prepareFile(int order, Matrix swarm){
         try{
             String orderFileName = newName + order + ".nc";
             copyFile(fileName, orderFileName, true);
             NetcdfFileWriteable ncfile = NetcdfFileWriteable.openExisting(orderFileName);
-            List<Dimension> list =  ncfile.getDimensions();
-
-//            for(Dimension d : list){
-//                System.out.println("name="+d.getName()+" length="+d.getLength());
-//            }
-//            //read variables
-//            List<Variable> variables = ncfile.getVariables();
-//            System.out.println();
-//            for(Variable v : variables){
-//                System.out.println("name="+v.getName()+" NameAndDimension="+v.getNameAndDimensions()+" ElementSize="+v.getElementSize());
-//            }
-
-            String variable = "temp";
-            Variable varbean = ncfile.findVariable(variable);
-
-//            Array part = varbean.read("0:0:1, 0:0:1, 0:199:1, 0:359:1");
-//            System.out.println(NCdumpW.printArray(part, variable, null));
 
             Dimension xaxis = ncfile.getDimensions().get(0);
             Dimension yaxis = ncfile.getDimensions().get(1);
@@ -54,19 +38,18 @@ public class FileHelper {
             for(int i = 0; i < yaxis.getLength(); i++){
                 for(int j = 0; j < xaxis.getLength(); j++){
                     double sst = sstaArray.get(index.set(0, 0, i, j));
-                    double ssta = matrix.get(i, j);
+                    double ssta = swarm.get(i, j);
                     sstaArray.set(index.set(0, 0, i, j), sst + ssta);
                 }
             }
 
-            ncfile.write("temp", sstaArray);
+            ncfile.write(PARAMETER, sstaArray);
 
-            return null;
+            return orderFileName;
         } catch (Exception e){
             e.printStackTrace();
+            return null;
         }
-
-        return null;
 
     }
 

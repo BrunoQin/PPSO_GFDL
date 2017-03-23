@@ -1,7 +1,11 @@
 package com.tongji.bruno.gfdl.algorithm.ppso;
 
 import Jama.Matrix;
+import com.tongji.bruno.gfdl.tool.FileHelper;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,13 +15,16 @@ import java.util.List;
 public class PPSO {
 
     private static final int PCACOUNT = 80;
+    private static final int XAXIS = 360;
+    private static final int YAXIS = 200;
     private static final double BESTADAPT = 0.0;
     private static final int STEP = 10;
+
+    private static final String CMD = "cmd /c \"D: && dir";
 
     private Matrix lambdaMatrix;
 
     private int swarmCount; //粒子数量
-    private int dimension; //粒子矩阵行数
     private List<Matrix> swarmMatrices; //粒子群当前位置
     private List<Matrix> swarmPBest; //粒子个体极值位置
     private double[] swarmPBestValue; //粒子群个体极值
@@ -32,8 +39,7 @@ public class PPSO {
     public PPSO(int swarmCount){
         this.swarmCount = swarmCount;
         // todo
-        this.lambdaMatrix = Matrix.random(dimension, PCACOUNT);
-        //this.dimension = lambdaMatrix.getRowDimension();
+        this.lambdaMatrix = Matrix.random(XAXIS * YAXIS, PCACOUNT);
     }
 
     /**
@@ -95,8 +101,44 @@ public class PPSO {
         return null;
     }
 
-    public double adaptValue(int index, Matrix swarm){
+    public double adaptValue(int order, Matrix swarm){
         //这个地方要联系矩阵修改文件，并且要用java调shell，很麻烦！
+        //把粒子变成原空间
+        Matrix sourceMatrix = this.lambdaMatrix.times(swarm);
+        int row = sourceMatrix.getRowDimension();
+        int col = sourceMatrix.getColumnDimension();
+        double[][] sstArray = new double[XAXIS][YAXIS];
+        for(int i = 0; i < row; i++){
+            for(int j = 0; j < col; j++){
+                sstArray[j / YAXIS][j % YAXIS] = sourceMatrix.get(i, j);
+            }
+        }
+        Matrix sstMatrix = new Matrix(sstArray);
+
+        String orderFileName = FileHelper.prepareFile(order, sstMatrix);
+        FileHelper.copyFile(orderFileName, "path to real input file and rename", true);
+
+        //调shell
+        try{
+            Process process = Runtime.getRuntime().exec(CMD);
+            process.waitFor();
+            InputStream is = process.getInputStream();
+            InputStreamReader isr = new InputStreamReader(is, "gbk"); //gbk：解决输出乱码
+            BufferedReader br = new BufferedReader(isr);
+            String line;
+            while ((line = br.readLine()) != null){
+                System.out.println(line);
+            }
+
+            is.close();
+            isr.close();
+            br.close();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+        //处理restart文件 todo
+
         return 2.0;
     }
 
@@ -104,7 +146,7 @@ public class PPSO {
 
         Matrix v = this.swarmV.get(index).times(w)
                 .plus((this.swarmPBest.get(index).minus(this.swarmMatrices.get(index))).times((Math.random() * c1)))
-                .plus((this.swarmGBest.minus(this.swarmMatrices.get(index))).times((Math.random() * c1)));
+                .plus((this.swarmGBest.minus(this.swarmMatrices.get(index))).times((Math.random() * c2)));
         this.swarmV.set(index, v);
         this.swarmMatrices.set(index, this.swarmMatrices.get(index).plus(v));
 
