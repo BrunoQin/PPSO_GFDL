@@ -1,6 +1,6 @@
 package com.tongji.bruno.gfdl.tool;
 
-import ucar.ma2.Array;
+import Jama.Matrix;
 import ucar.ma2.ArrayDouble;
 import ucar.ma2.Index;
 import ucar.nc2.*;
@@ -14,27 +14,36 @@ import java.util.List;
 public class FileHelper {
 
     private static final String fileName = "D:\\github\\PPSO_GFDL\\src\\main\\resources\\ocean_temp_salt.res.nc";
-    private static final String newName = "D:\\github\\PPSO_GFDL\\src\\main\\resources\\1.nc";
+    private static final String newName = "D:\\github\\PPSO_GFDL\\src\\main\\resources\\ocean_temp_salt_";
 
-    public static String test(){
+    /**
+     * 将原文件拷贝成新文件，并将粒子矩阵写回新文件
+     * @param order
+     * @param matrix
+     * @return
+     */
+    public static String prepareFile(int order, Matrix matrix){
         try{
-            copyFile(fileName, newName, true);
-            NetcdfFileWriteable ncfile = NetcdfFileWriteable.openExisting(newName);
+            String orderFileName = newName + order + ".nc";
+            copyFile(fileName, orderFileName, true);
+            NetcdfFileWriteable ncfile = NetcdfFileWriteable.openExisting(orderFileName);
             List<Dimension> list =  ncfile.getDimensions();
-            for(Dimension d : list){
-                System.out.println("name="+d.getName()+" length="+d.getLength());
-            }
-            //read variables
-            List<Variable> variables = ncfile.getVariables();
-            System.out.println();
-            for(Variable v : variables){
-                System.out.println("name="+v.getName()+" NameAndDimension="+v.getNameAndDimensions()+" ElementSize="+v.getElementSize());
-            }
+
+//            for(Dimension d : list){
+//                System.out.println("name="+d.getName()+" length="+d.getLength());
+//            }
+//            //read variables
+//            List<Variable> variables = ncfile.getVariables();
+//            System.out.println();
+//            for(Variable v : variables){
+//                System.out.println("name="+v.getName()+" NameAndDimension="+v.getNameAndDimensions()+" ElementSize="+v.getElementSize());
+//            }
 
             String variable = "temp";
             Variable varbean = ncfile.findVariable(variable);
-            Array part = varbean.read("0:0:1, 0:0:1, 0:199:1, 0:359:1");
-            System.out.println("x轴从0到2 跨度为2 y轴从0到2 跨度为2：\n" + NCdumpW.printArray(part, variable, null));
+
+//            Array part = varbean.read("0:0:1, 0:0:1, 0:199:1, 0:359:1");
+//            System.out.println(NCdumpW.printArray(part, variable, null));
 
             Dimension xaxis = ncfile.getDimensions().get(0);
             Dimension yaxis = ncfile.getDimensions().get(1);
@@ -44,7 +53,9 @@ public class FileHelper {
             Index index = sstaArray.getIndex();
             for(int i = 0; i < yaxis.getLength(); i++){
                 for(int j = 0; j < xaxis.getLength(); j++){
-                    sstaArray.set(index.set(0, 0, i, j), (double) (3));
+                    double sst = sstaArray.get(index.set(0, 0, i, j));
+                    double ssta = matrix.get(i, j);
+                    sstaArray.set(index.set(0, 0, i, j), sst + ssta);
                 }
             }
 
