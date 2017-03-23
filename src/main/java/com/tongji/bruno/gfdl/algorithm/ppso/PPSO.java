@@ -58,7 +58,7 @@ public class PPSO {
         this.swarmPBest = this.swarmMatrices;
         this.swarmPBestValue = new double[swarmCount];
         for(int i = 0; i < this.swarmMatrices.size(); i++){
-            this.swarmPBestValue[i] = adaptValue(this.swarmMatrices.get(i));
+            this.swarmPBestValue[i] = adaptValue(i, this.swarmMatrices.get(i));
         }
 
         //初始化群体极值
@@ -72,10 +72,31 @@ public class PPSO {
             this.swarmV.add(Matrix.random(PCACOUNT, 1));
         }
 
+        for(int i = 0; i < STEP; i++){
+            for(int j = 0; j < this.swarmCount; j++){
+                advanceStep(j);
+                double currentAdapt = adaptValue(j, this.swarmMatrices.get(j));
+                //更新粒子个体最优矩阵和值
+                // todo
+                if(currentAdapt > this.swarmPBestValue[j]){
+                    this.swarmPBestValue[j] = currentAdapt;
+                    this.swarmPBest.set(j, this.swarmMatrices.get(j));
+                }
+            }
+            index = getMaxIndex(this.swarmPBestValue);
+            //更新粒子群体最优矩阵和值
+            // todo
+            if(this.swarmGBestValue > this.swarmPBestValue[index]){
+                this.swarmGBestValue = this.swarmPBestValue[index];
+                this.swarmGBest = this.swarmPBest.get(index);
+            }
+        }
+
         return null;
     }
 
-    public double adaptValue(Matrix swarm){
+    public double adaptValue(int index, Matrix swarm){
+        //这个地方要联系矩阵修改文件，并且要用java调shell，很麻烦！
         return 2.0;
     }
 
