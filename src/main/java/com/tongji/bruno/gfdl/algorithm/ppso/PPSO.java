@@ -22,7 +22,8 @@ public class PPSO {
 
     private static final String CMD = "cmd /c \"D: && dir";
 
-    private Matrix lambdaMatrix;
+    private Matrix lambdaMatrix; //100年的平均态
+    private Matrix sepLambdaMatrix; //100年中九月份的平均态
 
     private int swarmCount; //粒子数量
     private List<Matrix> swarmMatrices; //粒子群当前位置
@@ -40,6 +41,7 @@ public class PPSO {
         this.swarmCount = swarmCount;
         // todo
         this.lambdaMatrix = Matrix.random(XAXIS * YAXIS, PCACOUNT);
+        this.sepLambdaMatrix = Matrix.random(XAXIS * YAXIS, PCACOUNT);
     }
 
     /**
@@ -137,9 +139,20 @@ public class PPSO {
             e.printStackTrace();
         }
 
-        //处理restart文件 todo
+        //处理restart文件获得adaptValue todo
+        //首先读取ocean_temp_salt文件 找到第九个月的sst
+        //计算（sst-sst'）平方求和 该值即为适应度值
+        Matrix optputMatrix = FileHelper.readRestartFile();
+        Matrix delta = optputMatrix.minus(this.sepLambdaMatrix);
+        //找到计算适应度值的范围
+        double adapt = 0;
+        for(int i = 0; i < 359; i++){
+            for(int j = 0; j < 199; j++){
+                adapt = Math.pow((optputMatrix.get(i, j) - delta.get(i, j)), 2);
+            }
+        }
 
-        return 2.0;
+        return adapt;
     }
 
     public void advanceStep(int index){

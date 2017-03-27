@@ -15,6 +15,7 @@ public class FileHelper {
 
     private static final String fileName = "D:\\github\\PPSO_GFDL\\src\\main\\resources\\ocean_temp_salt.res.nc";
     private static final String newName = "D:\\github\\PPSO_GFDL\\src\\main\\resources\\ocean_temp_salt_";
+    private static final String RESTART_FILENAME = "D:\\github\\PPSO_GFDL\\src\\main\\resources\\ocean_temp_salt.res.nc";
     private static final String PARAMETER = "temp";
 
     /**
@@ -51,6 +52,31 @@ public class FileHelper {
             return null;
         }
 
+    }
+
+    public static Matrix readRestartFile(){
+        try{
+            NetcdfFileWriteable ncfile = NetcdfFileWriteable.openExisting(RESTART_FILENAME);
+
+            Dimension xaxis = ncfile.getDimensions().get(0);
+            Dimension yaxis = ncfile.getDimensions().get(1);
+            Dimension zaxis = ncfile.getDimensions().get(2);
+            Dimension time = ncfile.getDimensions().get(3);
+            ArrayDouble sstaArray = new ArrayDouble.D4(time.getLength(), zaxis.getLength(), yaxis.getLength(), xaxis.getLength());
+            double[][]  temp = new double[yaxis.getLength()][xaxis.getLength()];
+            Index index = sstaArray.getIndex();
+            for(int i = 0; i < yaxis.getLength(); i++){
+                for(int j = 0; j < xaxis.getLength(); j++){
+                    //读取第九个月的数据 todo
+                    temp[i][j] = sstaArray.get(index.set(8, 0, i, j));
+                }
+            }
+
+            return new Matrix(temp);
+        } catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public static boolean copyFile(String srcFileName, String destFileName, boolean overlay) {
