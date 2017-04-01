@@ -1,11 +1,8 @@
 package com.tongji.bruno.gfdl.algorithm.ppso;
 
 import Jama.Matrix;
-import com.tongji.bruno.gfdl.tool.FileHelper;
+import com.tongji.bruno.gfdl.ppso.tool.FileHelper;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,8 +16,6 @@ public class PPSO {
     private static final int YAXIS = 200;
     private static final double BESTADAPT = 0.0;
     private static final int STEP = 10;
-
-    private static final String CMD = "cmd /c \"D: && dir";
 
     private Matrix lambdaMatrix; //100年的平均态
     private Matrix sepLambdaMatrix; //100年中九月份的平均态
@@ -121,34 +116,17 @@ public class PPSO {
         FileHelper.copyFile(orderFileName, "path to real input file and rename", true);
 
         //调shell
-        try{
-            Process process = Runtime.getRuntime().exec(CMD);
-            process.waitFor();
-            InputStream is = process.getInputStream();
-            InputStreamReader isr = new InputStreamReader(is, "gbk"); //gbk：解决输出乱码
-            BufferedReader br = new BufferedReader(isr);
-            String line;
-            while ((line = br.readLine()) != null){
-                System.out.println(line);
-            }
-
-            is.close();
-            isr.close();
-            br.close();
-        } catch (Exception e){
-            e.printStackTrace();
-        }
 
         //处理restart文件获得adaptValue todo
         //首先读取ocean_temp_salt文件 找到第九个月的sst
         //计算（sst-sst'）平方求和 该值即为适应度值
-        Matrix optputMatrix = FileHelper.readRestartFile();
-        Matrix delta = optputMatrix.minus(this.sepLambdaMatrix);
+        Matrix outputMatrix = FileHelper.readRestartFile();
+        Matrix delta = outputMatrix.minus(this.sepLambdaMatrix);
         //找到计算适应度值的范围
         double adapt = 0;
         for(int i = 0; i < 359; i++){
             for(int j = 0; j < 199; j++){
-                adapt = Math.pow((optputMatrix.get(i, j) - delta.get(i, j)), 2);
+                adapt = Math.pow((outputMatrix.get(i, j) - delta.get(i, j)), 2);
             }
         }
 
