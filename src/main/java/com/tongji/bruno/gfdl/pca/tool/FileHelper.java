@@ -13,8 +13,8 @@ import java.util.List;
  */
 public class FileHelper {
 
-    private static final String fileName = "D:\\github\\PPSO_GFDL\\src\\main\\resources\\cdo.nc";
-    private static final String parameter = "sst";
+    private static final String fileName = "D:\\github\\PPSO_GFDL\\src\\main\\resources\\ssta_100year(all).nc";
+    private static final String parameter = "ssta";
 
     private int year;
     private List<Array> monthArrays;

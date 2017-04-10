@@ -17,7 +17,7 @@ public class CalculateHelper {
         double[][] sum = new double[shape[0]][shape[1]];
         Matrix sumMatrix = new Matrix(sum);
         for(int i = 0; i < monthArrays.size(); i++){
-            Matrix subMatrix = new Matrix(cal(monthArrays.get(i)));
+            Matrix subMatrix = new Matrix(toNormalArray(monthArrays.get(i)));
             sumMatrix = sumMatrix.plus(subMatrix);
         }
         sumMatrix = sumMatrix.times((double)1/monthArrays.size());
@@ -25,7 +25,7 @@ public class CalculateHelper {
         return sum;
     }
 
-    public static double[][] compose(List<double[][]> averageList, int year){
+    public static SingularValueDecomposition compose(List<double[][]> averageList, int year){
         int row = averageList.get(0).length;
         int col = averageList.get(0)[0].length;
         double[][] composedArray = new double[row * col][year];
@@ -37,15 +37,13 @@ public class CalculateHelper {
                 }
             }
         }
-        composedArray = composedMatrix.getArray();
-        SingularValueDecomposition i = composedMatrix.svd();
 //        i.getS().print(4, 6);
 //        i.getV().print(4, 6);
-        i.getU().print(4, 6);
-        return composedArray;
+//        i.getU().print(4, 6);
+        return composedMatrix.svd();
     }
 
-    private static double[][] cal(Array data){
+    private static double[][] toNormalArray(Array data){
 
         double[][] sstaMatrix;
 

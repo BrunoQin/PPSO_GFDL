@@ -1,5 +1,6 @@
 package com.tongji.bruno.gfdl.algorithm.pca;
 
+import Jama.SingularValueDecomposition;
 import com.tongji.bruno.gfdl.pca.tool.CalculateHelper;
 import com.tongji.bruno.gfdl.pca.tool.FileHelper;
 
@@ -13,7 +14,7 @@ public class PCA {
 
     private static final int YEAR = 100;
 
-    private double[][] composedArray;
+    private SingularValueDecomposition leftU;
 
     public PCA(){
 
@@ -31,15 +32,15 @@ public class PCA {
             averageList.add(average);
         }
 
-        this.composedArray = CalculateHelper.compose(averageList, YEAR);
+        this.leftU = CalculateHelper.compose(averageList, YEAR);
 
     }
 
-    public double[][] getComposedArray() {
-        return composedArray;
+    public SingularValueDecomposition getLeftU() {
+        return leftU;
     }
 
-    public void setComposedArray(double[][] composedArray) {
-        this.composedArray = composedArray;
+    public void setLeftU(SingularValueDecomposition leftU) {
+        this.leftU = leftU;
     }
 }

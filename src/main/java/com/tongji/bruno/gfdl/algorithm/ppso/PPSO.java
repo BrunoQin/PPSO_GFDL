@@ -32,10 +32,10 @@ public class PPSO {
     private double w = 2;
 
 
-    public PPSO(int swarmCount){
+    public PPSO(int swarmCount, Matrix lambdaMatrix){
         this.swarmCount = swarmCount;
         // todo
-        this.lambdaMatrix = Matrix.random(XAXIS * YAXIS, PCACOUNT);
+        this.lambdaMatrix = lambdaMatrix;
         this.sepLambdaMatrix = Matrix.random(XAXIS * YAXIS, PCACOUNT);
     }
 
@@ -43,11 +43,39 @@ public class PPSO {
      * 初始化生成一系列初始低维粒子矩阵
      * @return
      */
-    public List<Matrix> init(){
+    public List<Matrix> initSwarm(){
 
         this.swarmMatrices = new ArrayList<Matrix>();
         for(int i = 0; i < this.swarmCount; i++){
-            this.swarmMatrices.add(Matrix.random(PCACOUNT, 1));
+            Matrix mod = new Matrix(PCACOUNT, 1);
+            for(int j = 0; j < PCACOUNT; j++){
+                mod.set(j, 0, 0.5);
+            }
+            Matrix temp = Matrix.random(PCACOUNT, 1).minus(mod).times(4.0);
+            this.swarmMatrices.add(temp);
+            for(int j = 0; j < PCACOUNT; j++){
+                FileHelper.writeFile(Double.toString(temp.get(j, 0)), "D:\\github\\PPSO_GFDL\\src\\main\\resources\\" + i + ".txt");
+            }
+            this.swarmMatrices.set(i, this.lambdaMatrix.times(this.swarmMatrices.get(i)));
+        }
+
+        return this.swarmMatrices;
+
+    }
+
+    public List<Matrix> initV(){
+
+        this.swarmV = new ArrayList<Matrix>();
+        for(int i = 0; i < this.swarmCount; i++){
+            Matrix mod = new Matrix(PCACOUNT, 1);
+            for(int j = 0; j < PCACOUNT; j++){
+                mod.set(j, 0, 0.5);
+            }
+            Matrix temp = Matrix.random(PCACOUNT, 1).minus(mod).times(2.0);
+            this.swarmV.add(temp);
+            for(int j = 0; j < PCACOUNT; j++){
+                FileHelper.writeFile(Double.toString(temp.get(j, 0)), "D:\\github\\PPSO_GFDL\\src\\main\\resources\\v" + i + ".txt");
+            }
         }
 
         return this.swarmMatrices;
