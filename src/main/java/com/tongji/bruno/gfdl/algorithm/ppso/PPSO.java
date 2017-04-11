@@ -45,21 +45,50 @@ public class PPSO {
      */
     public List<Matrix> initSwarm(){
 
-        this.swarmMatrices = new ArrayList<Matrix>();
+        this.swarmMatrices = new ArrayList<Matrix>(this.swarmCount);
         for(int i = 0; i < this.swarmCount; i++){
             Matrix mod = new Matrix(PCACOUNT, 1);
             for(int j = 0; j < PCACOUNT; j++){
                 mod.set(j, 0, 0.5);
             }
-            Matrix temp = Matrix.random(PCACOUNT, 1).minus(mod).times(4.0);
+            Matrix temp = Matrix.random(PCACOUNT, 1).minus(mod).times(4.65);
             this.swarmMatrices.add(temp);
             for(int j = 0; j < PCACOUNT; j++){
                 FileHelper.writeFile(Double.toString(temp.get(j, 0)), "D:\\github\\PPSO_GFDL\\src\\main\\resources\\" + i + ".txt");
+            }
+            if(!isLegal(i)){
+                this.swarmMatrices.remove(temp);
+                FileHelper.deleteFile("D:\\github\\PPSO_GFDL\\src\\main\\resources\\" + i + ".txt");
+                i = i - 1;
+                continue;
             }
             this.swarmMatrices.set(i, this.lambdaMatrix.times(this.swarmMatrices.get(i)));
         }
 
         return this.swarmMatrices;
+
+    }
+
+    public boolean isLegal(int num){
+        double[][] tem = new double[80][1];
+        for(int j = 0; j < 80; j++){
+            tem[j][0] = FileHelper.readFile("D:\\github\\PPSO_GFDL\\src\\main\\resources\\" + num + ".txt")[j];
+        }
+
+        Matrix p = new Matrix(tem);
+        p = lambdaMatrix.times(p);
+        double[] lat = FileHelper.getLat();
+        double[][] sigma = FileHelper.getSigma();
+        double sum = 0.0;
+        for(int j = 0; j < 200; j++){
+            for(int k = 0; k < 360; k++){
+                sum += Math.pow(Math.cos(lat[j]) * p.get(k * 200 + j, 0) / sigma[j][k], 2);
+            }
+        }
+        if(Math.sqrt(sum) > 150){
+            return false;
+        }
+        return true;
 
     }
 
