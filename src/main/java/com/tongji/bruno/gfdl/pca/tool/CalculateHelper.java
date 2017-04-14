@@ -37,9 +37,7 @@ public class CalculateHelper {
                 }
             }
         }
-//        i.getS().print(4, 6);
-//        i.getV().print(4, 6);
-//        i.getU().print(4, 6);
+
         return composedMatrix.svd();
     }
 

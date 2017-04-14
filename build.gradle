@@ -1,3 +1,11 @@
+plugins {
+    id 'com.github.johnrengelman.shadow' version '1.2.3'
+    id 'java'
+    id 'scala'
+    id 'idea'
+    id 'application'
+}
+
 group 'PPSO_GFDL'
 version '1.0-SNAPSHOT'
 
@@ -7,6 +15,15 @@ sourceCompatibility = 1.5
 
 repositories {
     mavenCentral()
+}
+
+mainClassName="com.tongji.bruno.gfdl.PPSO_main"
+
+jar {
+    manifest {  //incubating版本，以后版本可能会改API
+        attributes("Main-Class": "com.KafkaWordCount",
+                "Implementation-Title": "Gradle")
+    }
 }
 
 dependencies {

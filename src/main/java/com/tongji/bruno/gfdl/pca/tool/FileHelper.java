@@ -1,5 +1,6 @@
 package com.tongji.bruno.gfdl.pca.tool;
 
+import com.tongji.bruno.gfdl.Constants;
 import ucar.ma2.Array;
 import ucar.nc2.NetcdfFile;
 import ucar.nc2.Variable;
@@ -13,7 +14,7 @@ import java.util.List;
  */
 public class FileHelper {
 
-    private static final String fileName = "D:\\github\\PPSO_GFDL\\src\\main\\resources\\ssta_100year(all).nc";
+    private static final String fileName = Constants.DATA_PATH + "ssta_100year(all).nc";
     private static final String parameter = "ssta";
 
     private int year;
@@ -30,7 +31,6 @@ public class FileHelper {
                 Array part = sst.read(year * 12 + i + ":" + (int)(year * 12 + i) + ":1, 0:199:1, 0:359:1");
                 this.monthArrays.add(part);
             }
-
 
         } catch (Exception e){
             e.printStackTrace();

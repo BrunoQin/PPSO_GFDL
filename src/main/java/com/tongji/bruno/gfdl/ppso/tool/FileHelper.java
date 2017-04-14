@@ -1,6 +1,7 @@
 package com.tongji.bruno.gfdl.ppso.tool;
 
 import Jama.Matrix;
+import com.tongji.bruno.gfdl.Constants;
 import ucar.ma2.Array;
 import ucar.ma2.ArrayDouble;
 import ucar.ma2.Index;
@@ -15,9 +16,8 @@ import java.util.List;
  */
 public class FileHelper {
 
-    private static final String fileName = "D:\\github\\PPSO_GFDL\\src\\main\\resources\\ocean_temp_salt.res.nc";
-    private static final String newName = "D:\\github\\PPSO_GFDL\\src\\main\\resources\\ocean_temp_salt_";
-    private static final String RESTART_FILENAME = "D:\\github\\PPSO_GFDL\\src\\main\\resources\\ocean_temp_salt.res.nc";
+    private static final String fileName = Constants.DATA_PATH + "ocean_temp_salt.res.nc";
+    private static final String RESTART_FILENAME = Constants.DATA_PATH + "sstclim_all.nc";
     private static final String PARAMETER = "temp";
 
     /**
@@ -28,7 +28,7 @@ public class FileHelper {
      */
     public static String prepareFile(int order, Matrix swarm){
         try{
-            String orderFileName = newName + order + ".nc";
+            String orderFileName = Constants.RESOURCE_PATH + order + "/ocean_temp_salt_" + order + ".nc";
             copyFile(fileName, orderFileName, true);
             NetcdfFileWriteable ncfile = NetcdfFileWriteable.openExisting(orderFileName);
 
@@ -40,11 +40,10 @@ public class FileHelper {
             Index index = sstaArray.getIndex();
             Variable varBean = ncfile.findVariable(PARAMETER);
             Array origin = varBean.read();
-            for(int i = 0; i < yaxis.getLength(); i++){
-                for(int j = 0; j < xaxis.getLength(); j++){
+            for(int i = 62; i < 129; i++){
+                for(int j = 0; j < 219; j++){
                     Array tem = varBean.read("0:0:1, 0:0:1, " + i + ":" + i + ":1, " + j + ":" + j + ":1");
                     double[] k =  (double[])tem.copyTo1DJavaArray();
-//                    System.out.println(k[0]);
                     double ssta = swarm.get(j * 200 + i, 0);
                     sstaArray.set(index.set(0, 0, i, j), k[0] + ssta);
                 }
@@ -63,7 +62,7 @@ public class FileHelper {
     public static double[][] getSigma(){
 
         try{
-            NetcdfFileWriteable ncfile = NetcdfFileWriteable.openExisting("D:\\github\\PPSO_GFDL\\src\\main\\resources\\ssta_100year(all).nc");
+            NetcdfFileWriteable ncfile = NetcdfFileWriteable.openExisting(Constants.DATA_PATH + "ssta_100year(all).nc");
             Variable sst = ncfile.findVariable("ssta");
             double[][][] march = new double[100][200][360];
 
@@ -102,7 +101,7 @@ public class FileHelper {
     public static double[] getLat(){
         try{
             NetcdfFile ncfile = null;
-            ncfile = NetcdfFile.open("D:\\github\\PPSO_GFDL\\src\\main\\resources\\ssta_100year(all).nc");
+            ncfile = NetcdfFile.open(Constants.DATA_PATH + "ssta_100year(all).nc");
             Variable lat = ncfile.findVariable("yt_ocean");
             double[] tem = (double[]) lat.read().copyToNDJavaArray();
             return tem;
@@ -116,17 +115,14 @@ public class FileHelper {
         try{
             NetcdfFileWriteable ncfile = NetcdfFileWriteable.openExisting(RESTART_FILENAME);
 
-            Dimension xaxis = ncfile.getDimensions().get(0);
-            Dimension yaxis = ncfile.getDimensions().get(1);
-            Dimension zaxis = ncfile.getDimensions().get(2);
-            Dimension time = ncfile.getDimensions().get(3);
-            ArrayDouble sstaArray = new ArrayDouble.D4(time.getLength(), zaxis.getLength(), yaxis.getLength(), xaxis.getLength());
-            double[][]  temp = new double[yaxis.getLength()][xaxis.getLength()];
-            Index index = sstaArray.getIndex();
-            for(int i = 0; i < yaxis.getLength(); i++){
-                for(int j = 0; j < xaxis.getLength(); j++){
-                    //读取第九个月的数据 todo
-                    temp[i][j] = sstaArray.get(index.set(8, 0, i, j));
+            Variable sst = ncfile.findVariable("sst");
+            Array part = sst.read("0:199:1, 0:359:1");
+            double[][]  temp = new double[200][360];
+            Index index = part.getIndex();
+            for(int i = 0; i < 200; i++){
+                for(int j = 0; j < 360; j++){
+                    //读取第九个月的数据
+                    temp[i][j] = part.getDouble(index.set(i, j));
                 }
             }
 
@@ -254,6 +250,39 @@ public class FileHelper {
             }
         } else {
             System.out.println("删除单个文件失败：" + fileName + "不存在！");
+            return false;
+        }
+    }
+
+    public static boolean deleteDirectory(String sPath) {
+        //如果sPath不以文件分隔符结尾，自动添加文件分隔符
+        if (!sPath.endsWith(File.separator)) {
+            sPath = sPath + File.separator;
+        }
+        File dirFile = new File(sPath);
+        //如果dir对应的文件不存在，或者不是一个目录，则退出
+        if (!dirFile.exists() || !dirFile.isDirectory()) {
+            return false;
+        }
+        boolean flag = true;
+        //删除文件夹下的所有文件(包括子目录)
+        File[] files = dirFile.listFiles();
+        for (int i = 0; i < files.length; i++) {
+            //删除子文件
+            if (files[i].isFile()) {
+                flag = deleteFile(files[i].getAbsolutePath());
+                if (!flag) break;
+            } //删除子目录
+            else {
+                flag = deleteDirectory(files[i].getAbsolutePath());
+                if (!flag) break;
+            }
+        }
+        if (!flag) return false;
+        //删除当前目录
+        if (dirFile.delete()) {
+            return true;
+        } else {
             return false;
         }
     }

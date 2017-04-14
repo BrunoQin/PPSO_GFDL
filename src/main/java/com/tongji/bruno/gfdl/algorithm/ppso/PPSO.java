@@ -1,8 +1,16 @@
 package com.tongji.bruno.gfdl.algorithm.ppso;
 
 import Jama.Matrix;
+import com.tongji.bruno.gfdl.Constants;
 import com.tongji.bruno.gfdl.ppso.tool.FileHelper;
+import com.tongji.bruno.gfdl.ppso.tool.ShellHelper;
+import ucar.ma2.Array;
+import ucar.ma2.Index;
+import ucar.nc2.Dimension;
+import ucar.nc2.NetcdfFile;
+import ucar.nc2.Variable;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,13 +20,11 @@ import java.util.List;
 public class PPSO {
 
     private static final int PCACOUNT = 80;
-    private static final int XAXIS = 360;
-    private static final int YAXIS = 200;
-    private static final double BESTADAPT = 0.0;
-    private static final int STEP = 10;
+    private static final int STEP = 4;
 
-    private Matrix lambdaMatrix; //100年的平均态
-    private Matrix sepLambdaMatrix; //100年中九月份的平均态
+    private Matrix lambdaMatrix; //主成分
+
+    private Matrix outputMatrix; //平均态
 
     private int swarmCount; //粒子数量
     private List<Matrix> swarmMatrices; //粒子群当前位置
@@ -34,9 +40,8 @@ public class PPSO {
 
     public PPSO(int swarmCount, Matrix lambdaMatrix){
         this.swarmCount = swarmCount;
-        // todo
         this.lambdaMatrix = lambdaMatrix;
-        this.sepLambdaMatrix = Matrix.random(XAXIS * YAXIS, PCACOUNT);
+        this.outputMatrix = FileHelper.readRestartFile();
     }
 
     /**
@@ -51,14 +56,14 @@ public class PPSO {
             for(int j = 0; j < PCACOUNT; j++){
                 mod.set(j, 0, 0.5);
             }
-            Matrix temp = Matrix.random(PCACOUNT, 1).minus(mod).times(4.65);
+            Matrix temp = Matrix.random(PCACOUNT, 1).minus(mod).times(2.0);
             this.swarmMatrices.add(temp);
             for(int j = 0; j < PCACOUNT; j++){
-                FileHelper.writeFile(Double.toString(temp.get(j, 0)), "D:\\github\\PPSO_GFDL\\src\\main\\resources\\" + i + ".txt");
+                FileHelper.writeFile(Double.toString(temp.get(j, 0)), Constants.RESOURCE_PATH + i + "/" + i + ".txt");
             }
             if(!isLegal(i)){
                 this.swarmMatrices.remove(temp);
-                FileHelper.deleteFile("D:\\github\\PPSO_GFDL\\src\\main\\resources\\" + i + ".txt");
+                FileHelper.deleteFile(Constants.RESOURCE_PATH + i + "/" + i + ".txt");
                 i = i - 1;
                 continue;
             }
@@ -72,7 +77,7 @@ public class PPSO {
     public boolean isLegal(int num){
         double[][] tem = new double[80][1];
         for(int j = 0; j < 80; j++){
-            tem[j][0] = FileHelper.readFile("D:\\github\\PPSO_GFDL\\src\\main\\resources\\" + num + ".txt")[j];
+            tem[j][0] = FileHelper.readFile(Constants.RESOURCE_PATH + num + "/" + num + ".txt")[j];
         }
 
         Matrix p = new Matrix(tem);
@@ -85,7 +90,7 @@ public class PPSO {
                 sum += Math.pow(Math.cos(lat[j]) * p.get(k * 200 + j, 0) / sigma[j][k], 2);
             }
         }
-        if(Math.sqrt(sum) > 150){
+        if (Math.sqrt(sum) > 150){
             return false;
         }
         return true;
@@ -100,10 +105,10 @@ public class PPSO {
             for(int j = 0; j < PCACOUNT; j++){
                 mod.set(j, 0, 0.5);
             }
-            Matrix temp = Matrix.random(PCACOUNT, 1).minus(mod).times(2.0);
+            Matrix temp = Matrix.random(PCACOUNT, 1).minus(mod).times(0.1);
             this.swarmV.add(temp);
             for(int j = 0; j < PCACOUNT; j++){
-                FileHelper.writeFile(Double.toString(temp.get(j, 0)), "D:\\github\\PPSO_GFDL\\src\\main\\resources\\v" + i + ".txt");
+                FileHelper.writeFile(Double.toString(temp.get(j, 0)), Constants.RESOURCE_PATH + i + "/v" + i + ".txt");
             }
         }
 
@@ -118,7 +123,7 @@ public class PPSO {
         this.swarmPBest = this.swarmMatrices;
         this.swarmPBestValue = new double[swarmCount];
         for(int i = 0; i < this.swarmMatrices.size(); i++){
-            this.swarmPBestValue[i] = adaptValue(i, this.swarmMatrices.get(i));
+            this.swarmPBestValue[i] = 0;
         }
 
         //初始化群体极值
@@ -134,62 +139,96 @@ public class PPSO {
 
         for(int i = 0; i < STEP; i++){
             for(int j = 0; j < this.swarmCount; j++){
-                advanceStep(j);
-                double currentAdapt = adaptValue(j, this.swarmMatrices.get(j));
+                System.out.println("step " + i + " swarm " + j + " is running! good luck!!!");
+                //准备文件
+                FileHelper.deleteFile(Constants.RESOURCE_PATH + j + "/" + j + ".txt");
+                FileHelper.prepareFile(j, this.lambdaMatrix.times(this.swarmMatrices.get(j)));
+                FileHelper.copyFile(Constants.RESOURCE_PATH + j + "/ocean_temp_salt_" + j + ".nc", Constants.INPUT_PATH + "/ocean_temp_salt.res.nc", true);
+                //调脚本
+                ShellHelper shellHelper = new ShellHelper("127.0.0.1", 22, "nscc1732_LX", "yzy@1159");
+                String[] com = {"bsub ." + Constants.EXP_PATH + "fr21.csh"};
+                shellHelper.executeCommands(com);
+                shellHelper.disconnect();
+                while(true){
+                    shellHelper = new ShellHelper("127.0.0.1", 22, "nscc1732_LX", "yzy@1159");
+                    String[] check = {"bjobs"};
+                    shellHelper.executeCommands(check);
+                    if(shellHelper.getResponse().contains("No")){
+                        shellHelper.disconnect();
+                        break;
+                    }
+                    shellHelper.disconnect();
+                }
+                double currentAdapt = adaptValue();
                 //更新粒子个体最优矩阵和值
-                // todo
                 if(currentAdapt > this.swarmPBestValue[j]){
                     this.swarmPBestValue[j] = currentAdapt;
                     this.swarmPBest.set(j, this.swarmMatrices.get(j));
                 }
+                FileHelper.writeFile("第" + i + "步第" + j + "个粒子" + Double.toString(this.swarmPBestValue[j]), Constants.RESOURCE_PATH  + "best.txt");
+                //善后工作，初始化运行条件以便后面工作
+                FileHelper.copyFile(Constants.HISTORY_PATH + "00510301.ocean_month.nc", Constants.RESOURCE_PATH + j + "/" + i + "_" + j + ".nc", true);
+
+                FileHelper.deleteDirectory(Constants.OUTPUT_PATH + "ascii");
+                FileHelper.deleteDirectory(Constants.OUTPUT_PATH + "history");
+                FileHelper.deleteDirectory(Constants.OUTPUT_PATH + "RESTART");
+                FileHelper.deleteFile(Constants.OUTPUT_PATH + "data_table");
+                FileHelper.deleteFile(Constants.OUTPUT_PATH + "diag_table");
+                FileHelper.deleteFile(Constants.OUTPUT_PATH + "field_table");
+                FileHelper.deleteFile(Constants.OUTPUT_PATH + "input.nml");
+
             }
             index = getMaxIndex(this.swarmPBestValue);
             //更新粒子群体最优矩阵和值
-            // todo
             if(this.swarmGBestValue > this.swarmPBestValue[index]){
                 this.swarmGBestValue = this.swarmPBestValue[index];
                 this.swarmGBest = this.swarmPBest.get(index);
+            }
+            //寻步
+            for(int j = 0; j < this.swarmCount; j++){
+                advanceStep(j);
             }
         }
 
         return null;
     }
 
-    public double adaptValue(int order, Matrix swarm){
-        //这个地方要联系矩阵修改文件，并且要用java调shell，很麻烦！
-        //把粒子变成原空间
-        Matrix sourceMatrix = this.lambdaMatrix.times(swarm);
-        int row = sourceMatrix.getRowDimension();
-        int col = sourceMatrix.getColumnDimension();
-        double[][] sstArray = new double[XAXIS][YAXIS];
-        for(int i = 0; i < row; i++){
-            for(int j = 0; j < col; j++){
-                sstArray[j / YAXIS][j % YAXIS] = sourceMatrix.get(i, j);
+    public double adaptValue(){
+
+        NetcdfFile ncfile = null;
+        try {
+            ncfile = NetcdfFile.open(Constants.HISTORY_PATH + "00510301.ocean_month.nc");
+
+            //处理restart文件获得adaptValue
+            //计算（sst-sst'）平方求和 该值即为适应度值
+            try{
+                Variable sst = ncfile.findVariable("sst");
+                Array part = sst.read("5:5:1, 0:199:1, 0:359:1");
+                Index index = part.reduce().getIndex();
+                double[][] tem = new double[200][360];
+                double adapt = 0;
+                for(int j = 0; j < 200; j++){
+                    for(int k = 0; k < 360; k++){
+                        tem[j][k] = part.reduce().getDouble(index.set(j, k)) - outputMatrix.get(j, k);
+                        adapt += Math.pow(tem[j][k], 2);
+                    }
+                }
+
+                return adapt;
+
+            } catch (Exception e){
+                e.printStackTrace();
             }
-        }
-        Matrix sstMatrix = new Matrix(sstArray);
 
-        String orderFileName = FileHelper.prepareFile(order, sstMatrix);
-        FileHelper.copyFile(orderFileName, "path to real input file and rename", true);
-
-        //调shell
-
-        //处理restart文件获得adaptValue todo
-        //首先读取ocean_temp_salt文件 找到第九个月的sst
-        //计算（sst-sst'）平方求和 该值即为适应度值
-        Matrix outputMatrix = FileHelper.readRestartFile();
-        Matrix delta = outputMatrix.minus(this.sepLambdaMatrix);
-        //找到计算适应度值的范围
-        double adapt = 0;
-        for(int i = 0; i < 359; i++){
-            for(int j = 0; j < 199; j++){
-                adapt = Math.pow((outputMatrix.get(i, j) - delta.get(i, j)), 2);
-            }
+        } catch (IOException ioe) {
+            return -1;
         }
 
-        return adapt;
+        return -1;
+
     }
 
+    // todo
     public void advanceStep(int index){
 
         Matrix v = this.swarmV.get(index).times(w)
