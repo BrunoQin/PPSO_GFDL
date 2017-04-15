@@ -303,4 +303,23 @@ public class FileHelper {
         }
         return (sum / (array.length - 1));
     }
+
+    public static String exec(String cmd){
+        Process process = null;
+        List<String> processList = new ArrayList<String>();
+        try {
+            process = Runtime.getRuntime().exec(cmd);
+            BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String line = "";
+            while ((line = input.readLine()) != null) {
+                processList.add(line);
+            }
+            input.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return processList.get(0);
+    }
+
 }

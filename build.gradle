@@ -1,28 +1,29 @@
-plugins {
-    id 'com.github.johnrengelman.shadow' version '1.2.3'
-    id 'java'
-    id 'scala'
-    id 'idea'
-    id 'application'
+apply plugin :'java'
+apply plugin: 'application'
+apply plugin: 'com.github.johnrengelman.shadow'
+
+mainClassName = 'com.tongji.bruno.gfdl.PPSO_main'
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.4'
+    }
 }
-
-group 'PPSO_GFDL'
-version '1.0-SNAPSHOT'
-
-apply plugin: 'java'
-
-sourceCompatibility = 1.5
 
 repositories {
     mavenCentral()
 }
 
-mainClassName="com.tongji.bruno.gfdl.PPSO_main"
-
-jar {
-    manifest {  //incubating版本，以后版本可能会改API
-        attributes("Main-Class": "com.KafkaWordCount",
-                "Implementation-Title": "Gradle")
+shadowJar {
+    baseName = 'ppso'
+    classifier = null
+    version = null
+    dependencies {
+        include(dependency('edu.ucar:netcdf:4.2'))
+        include(dependency('gov.nist.math:jama:1.0.3'))
     }
 }
 
@@ -31,7 +32,5 @@ dependencies {
     compile group: 'edu.ucar', name: 'netcdf', version: '4.2'
     // https://mvnrepository.com/artifact/gov.nist.math/jama
     compile group: 'gov.nist.math', name: 'jama', version: '1.0.3'
-    // https://mvnrepository.com/artifact/com.github.cverges.expect4j/expect4j
-    compile group: 'com.github.cverges.expect4j', name: 'expect4j', version: '1.6'
     testCompile group: 'junit', name: 'junit', version: '4.11'
 }

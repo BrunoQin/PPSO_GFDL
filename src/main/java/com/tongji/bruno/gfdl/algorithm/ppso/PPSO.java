@@ -3,10 +3,8 @@ package com.tongji.bruno.gfdl.algorithm.ppso;
 import Jama.Matrix;
 import com.tongji.bruno.gfdl.Constants;
 import com.tongji.bruno.gfdl.ppso.tool.FileHelper;
-import com.tongji.bruno.gfdl.ppso.tool.ShellHelper;
 import ucar.ma2.Array;
 import ucar.ma2.Index;
-import ucar.nc2.Dimension;
 import ucar.nc2.NetcdfFile;
 import ucar.nc2.Variable;
 
@@ -67,7 +65,6 @@ public class PPSO {
                 i = i - 1;
                 continue;
             }
-            this.swarmMatrices.set(i, this.lambdaMatrix.times(this.swarmMatrices.get(i)));
         }
 
         return this.swarmMatrices;
@@ -112,7 +109,7 @@ public class PPSO {
             }
         }
 
-        return this.swarmMatrices;
+        return this.swarmV;
 
     }
 
@@ -131,12 +128,6 @@ public class PPSO {
         this.swarmGBestValue = this.swarmPBestValue[index];
         this.swarmGBest = this.swarmPBest.get(index);
 
-        //初始化粒子速度
-        this.swarmV = new ArrayList<Matrix>();
-        for(int i = 0; i < this.swarmCount; i++){
-            this.swarmV.add(Matrix.random(PCACOUNT, 1));
-        }
-
         for(int i = 0; i < STEP; i++){
             for(int j = 0; j < this.swarmCount; j++){
                 System.out.println("step " + i + " swarm " + j + " is running! good luck!!!");
@@ -145,19 +136,12 @@ public class PPSO {
                 FileHelper.prepareFile(j, this.lambdaMatrix.times(this.swarmMatrices.get(j)));
                 FileHelper.copyFile(Constants.RESOURCE_PATH + j + "/ocean_temp_salt_" + j + ".nc", Constants.INPUT_PATH + "/ocean_temp_salt.res.nc", true);
                 //调脚本
-                ShellHelper shellHelper = new ShellHelper("127.0.0.1", 22, "nscc1732_LX", "yzy@1159");
-                String[] com = {"bsub ." + Constants.EXP_PATH + "fr21.csh"};
-                shellHelper.executeCommands(com);
-                shellHelper.disconnect();
+                FileHelper.exec("cd " + Constants.EXP_PATH + " && bsub ./fr21.csh");
                 while(true){
-                    shellHelper = new ShellHelper("127.0.0.1", 22, "nscc1732_LX", "yzy@1159");
-                    String[] check = {"bjobs"};
-                    shellHelper.executeCommands(check);
-                    if(shellHelper.getResponse().contains("No")){
-                        shellHelper.disconnect();
+                    String tem = FileHelper.exec("bjobs");
+                    if(tem.contains("No")){
                         break;
                     }
-                    shellHelper.disconnect();
                 }
                 double currentAdapt = adaptValue();
                 //更新粒子个体最优矩阵和值

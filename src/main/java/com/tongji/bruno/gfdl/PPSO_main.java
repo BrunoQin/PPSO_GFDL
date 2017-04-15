@@ -5,15 +5,7 @@ import Jama.SingularValueDecomposition;
 import com.tongji.bruno.gfdl.algorithm.pca.PCA;
 import com.tongji.bruno.gfdl.algorithm.ppso.PPSO;
 import com.tongji.bruno.gfdl.ppso.tool.FileHelper;
-import com.tongji.bruno.gfdl.ppso.tool.ShellHelper;
-import ucar.ma2.Array;
-import ucar.ma2.Index;
-import ucar.nc2.Dimension;
-import ucar.nc2.NetcdfFile;
-import ucar.nc2.NetcdfFileWriteable;
-import ucar.nc2.Variable;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -36,6 +28,8 @@ public class PPSO_main {
         for(int k = 0; k < 80; k++){
             lambdaMatrix.setMatrix(0, row - 1, k, k, u.getMatrix(0, row - 1, k, k));
         }
+
+        System.out.println("pca finish!");
 
         PPSO ppso = new PPSO(6, lambdaMatrix);
         List<Matrix> swarmMatrices = ppso.initSwarm();
