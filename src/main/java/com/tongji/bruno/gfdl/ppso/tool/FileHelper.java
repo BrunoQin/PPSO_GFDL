@@ -315,11 +315,13 @@ public class FileHelper {
                 processList.add(line);
             }
             input.close();
+            return processList.get(0);
         } catch (IOException e) {
+            System.out.println("error");
             e.printStackTrace();
+            return "error";
         }
 
-        return processList.get(0);
     }
 
 }

@@ -130,13 +130,13 @@ public class PPSO {
 
         for(int i = 0; i < STEP; i++){
             for(int j = 0; j < this.swarmCount; j++){
-                System.out.println("step " + i + " swarm " + j + " is running! good luck!!!");
                 //准备文件
                 FileHelper.deleteFile(Constants.RESOURCE_PATH + j + "/" + j + ".txt");
                 FileHelper.prepareFile(j, this.lambdaMatrix.times(this.swarmMatrices.get(j)));
                 FileHelper.copyFile(Constants.RESOURCE_PATH + j + "/ocean_temp_salt_" + j + ".nc", Constants.INPUT_PATH + "/ocean_temp_salt.res.nc", true);
+                System.out.println("step " + i + " swarm " + j + " is running! good luck!!!");
                 //调脚本
-                FileHelper.exec("cd " + Constants.EXP_PATH + " && bsub ./fr21.csh");
+                FileHelper.exec("bsub ./fr21.csh");
                 while(true){
                     String tem = FileHelper.exec("bjobs");
                     if(tem.contains("No")){
@@ -212,7 +212,6 @@ public class PPSO {
 
     }
 
-    // todo
     public void advanceStep(int index){
 
         Matrix v = this.swarmV.get(index).times(w)
