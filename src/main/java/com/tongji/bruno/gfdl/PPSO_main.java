@@ -5,6 +5,7 @@ import Jama.SingularValueDecomposition;
 import com.tongji.bruno.gfdl.algorithm.pca.PCA;
 import com.tongji.bruno.gfdl.algorithm.ppso.PPSO;
 import com.tongji.bruno.gfdl.ppso.tool.FileHelper;
+import com.tongji.bruno.gfdl.ppso.tool.ShellHelper;
 
 import java.util.List;
 
@@ -12,8 +13,6 @@ import java.util.List;
  * Created by 秦博 on 2017/3/22.
  */
 public class PPSO_main {
-
-    private static final String fileName = "D:\\github\\PPSO_GFDL\\src\\main\\resources\\ocean_month.nc";
 
     public static void main(String[] args) {
         System.out.println("hello world!");

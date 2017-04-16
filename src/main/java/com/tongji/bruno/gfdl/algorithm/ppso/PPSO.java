@@ -10,6 +10,7 @@ import ucar.nc2.NetcdfFile;
 import ucar.nc2.Variable;
 
 import java.io.IOException;
+import java.security.spec.ECField;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -133,16 +134,26 @@ public class PPSO {
             for(int j = 0; j < this.swarmCount; j++){
                 //准备文件
                 FileHelper.deleteFile(Constants.RESOURCE_PATH + j + "/" + j + ".txt");
+//                FileHelper.copyFile(Constants.DATA_PATH + "/ocean_temp_salt.res.nc", Constants.INPUT_PATH + "/ocean_temp_salt.res.nc", true);
                 FileHelper.prepareFile(j, this.lambdaMatrix.times(this.swarmMatrices.get(j)));
                 FileHelper.copyFile(Constants.RESOURCE_PATH + j + "/ocean_temp_salt_" + j + ".nc", Constants.INPUT_PATH + "/ocean_temp_salt.res.nc", true);
                 System.out.println("step " + i + " swarm " + j + " is running! good luck!!!");
                 //调脚本
-                ShellHelper.exec("bsub ./fr21.csh");
+                System.out.println(ShellHelper.exec("bsub ./fr21.csh"));
                 while(true){
-                    String tem = ShellHelper.exec("bjobs");
-                    if(tem == null){
-                        break;
+                    try{
+                        Thread.sleep(1000 * 60 * 5);
+                        String tem = ShellHelper.exec("bjobs");
+                        if(tem.equals("")){
+                            System.out.println("step " + i + " swarm " + j + " finish! ");
+                            break;
+                        } else {
+                            System.out.println("Not Yet!");
+                        }
+                    } catch (Exception e){
+                        e.printStackTrace();
                     }
+
                 }
                 double currentAdapt = adaptValue();
                 //更新粒子个体最优矩阵和值
@@ -151,9 +162,10 @@ public class PPSO {
                     this.swarmPBest.set(j, this.swarmMatrices.get(j));
                 }
                 FileHelper.writeFile("第" + i + "步第" + j + "个粒子" + Double.toString(this.swarmPBestValue[j]), Constants.RESOURCE_PATH  + "best.txt");
-                //善后工作，初始化运行条件以便后面工作
-                FileHelper.copyFile(Constants.HISTORY_PATH + "00510301.ocean_month.nc", Constants.RESOURCE_PATH + j + "/" + i + "_" + j + ".nc", true);
+                System.out.println("step " + i + " swarm " + j + " is cleaning! ");
 
+                //善后工作，初始化运行条件以便后面工作
+//                FileHelper.copyFile(Constants.HISTORY_PATH + "00510301.ocean_month.nc", Constants.RESOURCE_PATH + j + "/" + i + "_" + j + ".nc", true);
                 FileHelper.deleteDirectory(Constants.OUTPUT_PATH + "ascii");
                 FileHelper.deleteDirectory(Constants.OUTPUT_PATH + "history");
                 FileHelper.deleteDirectory(Constants.OUTPUT_PATH + "RESTART");
@@ -188,7 +200,7 @@ public class PPSO {
             //计算（sst-sst'）平方求和 该值即为适应度值
             try{
                 Variable sst = ncfile.findVariable("sst");
-                Array part = sst.read("5:5:1, 0:199:1, 0:359:1");
+                Array part = sst.read("0:0:1, 0:199:1, 0:359:1");
                 Index index = part.reduce().getIndex();
                 double[][] tem = new double[200][360];
                 double adapt = 0;
