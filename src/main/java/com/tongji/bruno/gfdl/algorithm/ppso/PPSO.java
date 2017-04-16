@@ -3,6 +3,7 @@ package com.tongji.bruno.gfdl.algorithm.ppso;
 import Jama.Matrix;
 import com.tongji.bruno.gfdl.Constants;
 import com.tongji.bruno.gfdl.ppso.tool.FileHelper;
+import com.tongji.bruno.gfdl.ppso.tool.ShellHelper;
 import ucar.ma2.Array;
 import ucar.ma2.Index;
 import ucar.nc2.NetcdfFile;
@@ -136,9 +137,9 @@ public class PPSO {
                 FileHelper.copyFile(Constants.RESOURCE_PATH + j + "/ocean_temp_salt_" + j + ".nc", Constants.INPUT_PATH + "/ocean_temp_salt.res.nc", true);
                 System.out.println("step " + i + " swarm " + j + " is running! good luck!!!");
                 //调脚本
-                FileHelper.exec("bsub ./fr21.csh");
+                ShellHelper.exec("bsub ./fr21.csh");
                 while(true){
-                    String tem = FileHelper.exec("bjobs");
+                    String tem = ShellHelper.exec("bjobs");
                     if(tem == null){
                         break;
                     }

@@ -304,23 +304,4 @@ public class FileHelper {
         return (sum / (array.length - 1));
     }
 
-    public static String exec(String cmd){
-        Process process = null;
-        try {
-            process = Runtime.getRuntime().exec(cmd);
-            BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            String line = "";
-            while ((line = input.readLine()) != null) {
-                System.out.println(line);
-            }
-            input.close();
-            return line;
-        } catch (Exception e) {
-            System.out.println("blank");
-            e.printStackTrace();
-            return "error";
-        }
-
-    }
-
 }
