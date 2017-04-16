@@ -139,7 +139,7 @@ public class PPSO {
                 FileHelper.exec("bsub ./fr21.csh");
                 while(true){
                     String tem = FileHelper.exec("bjobs");
-                    if(tem.contains("No")){
+                    if(tem == null){
                         break;
                     }
                 }

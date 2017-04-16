@@ -39,7 +39,6 @@ public class PPSO_main {
         for(int k = 0; k < 80; k++){
             FileHelper.writeFile(Double.toString(gbest.get(k, 0)), Constants.RESOURCE_PATH  + "best.txt");
         }
-
         //===================主体======================
 
     }

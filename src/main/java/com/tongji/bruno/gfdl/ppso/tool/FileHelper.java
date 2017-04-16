@@ -306,18 +306,17 @@ public class FileHelper {
 
     public static String exec(String cmd){
         Process process = null;
-        List<String> processList = new ArrayList<String>();
         try {
             process = Runtime.getRuntime().exec(cmd);
             BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String line = "";
             while ((line = input.readLine()) != null) {
-                processList.add(line);
+                System.out.println(line);
             }
             input.close();
-            return processList.get(0);
-        } catch (IOException e) {
-            System.out.println("error");
+            return line;
+        } catch (Exception e) {
+            System.out.println("blank");
             e.printStackTrace();
             return "error";
         }
