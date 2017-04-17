@@ -165,7 +165,6 @@ public class PPSO {
                 System.out.println("step " + i + " swarm " + j + " is cleaning! ");
 
                 //善后工作，初始化运行条件以便后面工作
-//                FileHelper.copyFile(Constants.HISTORY_PATH + "00510301.ocean_month.nc", Constants.RESOURCE_PATH + j + "/" + i + "_" + j + ".nc", true);
                 FileHelper.deleteDirectory(Constants.OUTPUT_PATH + "ascii");
                 FileHelper.deleteDirectory(Constants.OUTPUT_PATH + "history");
                 FileHelper.deleteDirectory(Constants.OUTPUT_PATH + "RESTART");
@@ -173,6 +172,9 @@ public class PPSO {
                 FileHelper.deleteFile(Constants.OUTPUT_PATH + "diag_table");
                 FileHelper.deleteFile(Constants.OUTPUT_PATH + "field_table");
                 FileHelper.deleteFile(Constants.OUTPUT_PATH + "input.nml");
+
+                FileHelper.deleteFile(Constants.EXP_PATH + "CM2.1p1.output.tar.gz");
+                FileHelper.deleteFile(Constants.EXP_PATH + "fms.out");
 
             }
             index = getMaxIndex(this.swarmPBestValue);
