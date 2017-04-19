@@ -52,6 +52,7 @@ public class PPSO {
 
         this.swarmMatrices = new ArrayList<Matrix>(this.swarmCount);
         for(int i = 0; i < this.swarmCount; i++){
+            FileHelper.createDir(Constants.RESOURCE_PATH + i);
             Matrix mod = new Matrix(PCACOUNT, 1);
             for(int j = 0; j < PCACOUNT; j++){
                 mod.set(j, 0, 0.5);
