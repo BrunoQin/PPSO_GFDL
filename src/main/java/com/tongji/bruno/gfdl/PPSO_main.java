@@ -5,7 +5,6 @@ import Jama.SingularValueDecomposition;
 import com.tongji.bruno.gfdl.algorithm.pca.PCA;
 import com.tongji.bruno.gfdl.algorithm.ppso.PPSO;
 import com.tongji.bruno.gfdl.ppso.tool.FileHelper;
-import com.tongji.bruno.gfdl.ppso.tool.ShellHelper;
 
 import java.util.List;
 
