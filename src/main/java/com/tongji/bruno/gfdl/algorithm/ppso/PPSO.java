@@ -182,11 +182,11 @@ public class PPSO {
                     this.swarmPBestValue[j] = currentAdapt;
                     this.swarmPBest.set(j, this.swarmMatrices.get(j));
                 }
-                FileHelper.writeFile("第" + i + "步第" + j + "个粒子" + Double.toString(this.swarmPBestValue[j]), Constants.RESOURCE_PATH  + "best.txt");
+                FileHelper.writeFile("step" + i + "swarm" + j + "---" + Double.toString(this.swarmPBestValue[j]), Constants.RESOURCE_PATH  + "best.txt");
                 System.out.println("step " + i + " swarm " + j + " is cleaning! ");
 
-                FileHelper.copyFile(Constants.ROOT_PATH + j + "/CM2.1p1/INPUT/history/01310101.ocean_month.nc", Constants.RESOURCE_PATH + i + "_" + j + "_ocean.nc", true);
-                FileHelper.copyFile(Constants.ROOT_PATH + j + "/CM2.1p1/INPUT/history/01310101.atmosphere_month.nc", Constants.RESOURCE_PATH + i + "_" + j + "_atmosphere.nc", true);
+                FileHelper.copyFile(Constants.ROOT_PATH + j + "/CM2.1p1/history/01310101.ocean_month.nc", Constants.RESOURCE_PATH + i + "_" + j + "_ocean.nc", true);
+                FileHelper.copyFile(Constants.ROOT_PATH + j + "/CM2.1p1/history/01310101.atmosphere_month.nc", Constants.RESOURCE_PATH + i + "_" + j + "_atmosphere.nc", true);
 
                 //善后工作，初始化运行条件以便后面工作
                 FileHelper.deleteDirectory(Constants.ROOT_PATH + j + "/CM2.1p1/ascii");
@@ -222,7 +222,7 @@ public class PPSO {
 
         NetcdfFile ncfile = null;
         try {
-            ncfile = NetcdfFile.open(Constants.ROOT_PATH + order + "/CM2.1p1/INPUT/history/01310101.ocean_month.nc");
+            ncfile = NetcdfFile.open(Constants.ROOT_PATH + order + "/CM2.1p1/history/01310101.ocean_month.nc");
 
             //处理restart文件获得adaptValue
             //计算（sst-sst'）平方求和 该值即为适应度值

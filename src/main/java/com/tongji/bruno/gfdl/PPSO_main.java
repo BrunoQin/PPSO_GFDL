@@ -97,67 +97,6 @@ public class PPSO_main {
 //            e.printStackTrace();
 //        }
 
-//        ThreadHelper threadHelper = new ThreadHelper("1");
-//        threadHelper.start();
-
-//        System.out.println(1);
-//        ShellHelper.exec("sh command.csh 1");
-//        System.out.println(2);
-//        ShellHelper.callScript("command.csh", "1", Constants.RESOURCE_PATH);
-//        System.out.println(3);
-//        try {
-//            String shpath = Constants.RESOURCE_PATH + "command.csh 1";
-//            Process ps = Runtime.getRuntime().exec(shpath);
-//            ps.waitFor();
-//
-//            BufferedReader br = new BufferedReader(new InputStreamReader(ps.getInputStream()));
-//            StringBuffer sb = new StringBuffer();
-//            String line;
-//            while ((line = br.readLine()) != null) {
-//                sb.append(line).append("\n");
-//            }
-//            String result = sb.toString();
-//            System.out.println(result);
-//        }
-//        catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        System.out.println(4);
-//        try {
-//            String[] cmd = {"/bin/csh","-c","command.csh 1"};
-//            Process ps = Runtime.getRuntime().exec(cmd);
-//            ps.waitFor();
-//
-//            BufferedReader br = new BufferedReader(new InputStreamReader(ps.getInputStream()));
-//            StringBuffer sb = new StringBuffer();
-//            String line;
-//            while ((line = br.readLine()) != null) {
-//                sb.append(line).append("\n");
-//            }
-//            String result = sb.toString();
-//            System.out.println(result);
-//        }
-//        catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        System.out.println(5);
-//        try {
-//            String[] cmd = {"/bin/sh","-c","command.csh 1"};
-//            Process ps = Runtime.getRuntime().exec(cmd);
-//            ps.waitFor();
-//
-//            BufferedReader br = new BufferedReader(new InputStreamReader(ps.getInputStream()));
-//            StringBuffer sb = new StringBuffer();
-//            String line;
-//            while ((line = br.readLine()) != null) {
-//                sb.append(line).append("\n");
-//            }
-//            String result = sb.toString();
-//            System.out.println(result);
-//        }
-//        catch (Exception e) {
-//            e.printStackTrace();
-//        }
 
     }
 
