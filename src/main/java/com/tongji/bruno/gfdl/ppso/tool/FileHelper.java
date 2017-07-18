@@ -28,6 +28,7 @@ public class FileHelper {
      */
     public static String prepareFile(int order, Matrix swarm){
         try{
+
             String orderFileName = Constants.RESOURCE_PATH + order + "/ocean_temp_salt_" + order + ".nc";
             copyFile(fileName, orderFileName, true);
             NetcdfFileWriteable ncfile = NetcdfFileWriteable.openExisting(orderFileName);
@@ -40,12 +41,24 @@ public class FileHelper {
             Index index = sstaArray.getIndex();
             Variable varBean = ncfile.findVariable(PARAMETER);
             Array origin = varBean.read();
-            for(int i = 62; i < 129; i++){
-                for(int j = 0; j < 219; j++){
-                    Array tem = varBean.read("0:0:1, 0:0:1, " + i + ":" + i + ":1, " + j + ":" + j + ":1");
-                    double[] k =  (double[])tem.copyTo1DJavaArray();
-                    double ssta = swarm.get(j * 200 + i, 0);
-                    sstaArray.set(index.set(0, 0, i, j), k[0] + ssta);
+            for(int i = 0; i < 200; i++){
+                for(int j = 0; j < 360; j++){
+                    for(int k = 0; k < 50; k++){
+                        if(k == 0){
+                            Array tem = varBean.read("0:0:1, "+ k + ":" + k + ":1, " + i + ":" + i + ":1, " + j + ":" + j + ":1");
+                            double[] t =  (double[])tem.copyTo1DJavaArray();
+                            double ssta = swarm.get(j * 200 + i, 0);
+                            if(j < 40 || j > 220){
+                                sstaArray.set(index.set(0, k, i, j), t[0]);
+                            } else {
+                                sstaArray.set(index.set(0, k, i, j), t[0] + ssta);
+                            }
+                        } else {
+                            Array tem = varBean.read("0:0:1, " + k + ":" + k + ":1, " + i + ":" + i + ":1, " + j + ":" + j + ":1");
+                            double[] t =  (double[])tem.copyTo1DJavaArray();
+                            sstaArray.set(index.set(0, k, i, j), t[0]);
+                        }
+                    }
                 }
             }
 
@@ -56,8 +69,8 @@ public class FileHelper {
             e.printStackTrace();
             return null;
         }
-
     }
+
 
     public static double[][] getSigma(){
 
@@ -67,7 +80,7 @@ public class FileHelper {
             double[][][] march = new double[100][200][360];
 
             for(int i = 0; i < 100; i++){
-                Array part = sst.read(i * 12 + 2 + ":" + (int)(i * 12 + 2) + ":1, 0:199:1, 0:359:1");
+                Array part = sst.read(i * 12 + 2 + ":" + (i * 12 + 2) + ":1, 0:199:1, 0:359:1");
                 Index index = part.reduce().getIndex();
                 double[][] tem = new double[200][360];
                 for(int j = 0; j < 200; j++){
@@ -122,6 +135,7 @@ public class FileHelper {
             for(int i = 0; i < 200; i++){
                 for(int j = 0; j < 360; j++){
                     //读取第九个月的数据
+                    if(part.getDouble(index.set(i, j)) >= 9E36 )
                     temp[i][j] = part.getDouble(index.set(i, j));
                 }
             }
@@ -137,10 +151,10 @@ public class FileHelper {
         File srcFile = new File(srcFileName);
 
         if (!srcFile.exists()) {
-            System.out.println("源文件：" + srcFileName + "不存在！");
+            System.out.println(srcFileName + "not exist!");
             return false;
         } else if (!srcFile.isFile()) {
-            System.out.println("复制文件失败，源文件：" + srcFileName + "不是一个文件！");
+            System.out.println(srcFileName + "not a file!");
             return false;
         }
 
@@ -193,10 +207,10 @@ public class FileHelper {
             File file = new File(path);
             if(!file.exists())
                 file.createNewFile();
-            FileOutputStream out = new FileOutputStream(file,true); //如果追加方式用true
+            FileOutputStream out = new FileOutputStream(file,true);
             StringBuffer sb = new StringBuffer();
             sb.append(str + "\r\n");
-            out.write(sb.toString().getBytes("utf-8"));//注意需要转换对应的字符集
+            out.write(sb.toString().getBytes("utf-8"));
             out.close();
         }
         catch(IOException ex)
@@ -213,7 +227,7 @@ public class FileHelper {
             if(!file.exists())
                 file.createNewFile();
             InputStreamReader read = new InputStreamReader(
-                    new FileInputStream(file), "utf-8");// 考虑到编码格式
+                    new FileInputStream(file), "utf-8");
             BufferedReader bufferedReader = new BufferedReader(read);
             String lineTxt = null;
             lineTxt = bufferedReader.readLine();
@@ -239,40 +253,39 @@ public class FileHelper {
 
     public static boolean deleteFile(String fileName) {
         File file = new File(fileName);
-        // 如果文件路径所对应的文件存在，并且是一个文件，则直接删除
+
         if (file.exists() && file.isFile()) {
             if (file.delete()) {
-                System.out.println("删除单个文件" + fileName + "成功！");
+                System.out.println("delete" + fileName + " success!");
                 return true;
             } else {
-                System.out.println("删除单个文件" + fileName + "失败！");
+                System.out.println("delete" + fileName + " fail!");
                 return false;
             }
         } else {
-            System.out.println("删除单个文件失败：" + fileName + "不存在！");
+            System.out.println("delete:" + fileName + " not exist!");
             return false;
         }
     }
 
     public static boolean deleteDirectory(String sPath) {
-        //如果sPath不以文件分隔符结尾，自动添加文件分隔符
+
         if (!sPath.endsWith(File.separator)) {
             sPath = sPath + File.separator;
         }
         File dirFile = new File(sPath);
-        //如果dir对应的文件不存在，或者不是一个目录，则退出
+
         if (!dirFile.exists() || !dirFile.isDirectory()) {
             return false;
         }
         boolean flag = true;
-        //删除文件夹下的所有文件(包括子目录)
+
         File[] files = dirFile.listFiles();
         for (int i = 0; i < files.length; i++) {
-            //删除子文件
             if (files[i].isFile()) {
                 flag = deleteFile(files[i].getAbsolutePath());
                 if (!flag) break;
-            } //删除子目录
+            }
             else {
                 flag = deleteDirectory(files[i].getAbsolutePath());
                 if (!flag) break;
@@ -289,18 +302,18 @@ public class FileHelper {
 
     public static boolean createDir(String destDirName) {
         File dir = new File(destDirName);
-        if (dir.exists()) {// 判断目录是否存在
-            System.out.println("创建目录失败，目标目录已存在！");
+        if (dir.exists()) {
+            System.out.println("exist!");
             return false;
         }
-        if (!destDirName.endsWith(File.separator)) {// 结尾是否以"/"结束
+        if (!destDirName.endsWith(File.separator)) {
             destDirName = destDirName + File.separator;
         }
-        if (dir.mkdirs()) {// 创建目标目录
-            System.out.println("创建目录成功！" + destDirName);
+        if (dir.mkdirs()) {
+            System.out.println("create success!" + destDirName);
             return true;
         } else {
-            System.out.println("创建目录失败！");
+            System.out.println("create fail!");
             return false;
         }
     }

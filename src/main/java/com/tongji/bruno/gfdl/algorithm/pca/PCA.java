@@ -1,8 +1,10 @@
 package com.tongji.bruno.gfdl.algorithm.pca;
 
+import Jama.Matrix;
 import Jama.SingularValueDecomposition;
 import com.tongji.bruno.gfdl.pca.tool.CalculateHelper;
 import com.tongji.bruno.gfdl.pca.tool.FileHelper;
+import ucar.ma2.Array;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +14,7 @@ import java.util.List;
  */
 public class PCA {
 
-    private static final int YEAR = 100;
+    private static final int YEAR = 300;
 
     private SingularValueDecomposition leftU;
 
@@ -22,13 +24,16 @@ public class PCA {
         List<double[][]> averageList = new ArrayList<double[][]>();
 
         for(int i = 0; i < YEAR; i++){
-            FileHelper fileHelper =  new FileHelper(i);
+            System.out.print(i + " begin!");
+            FileHelper fileHelper =  new FileHelper(i * 12);
             fileHelperList.add(fileHelper);
         }
 
         for(int i = 0; i < YEAR; i++){
             double[][] average;
-            average = CalculateHelper.calAverage(fileHelperList.get(i).getMonthArrays());
+//            average = CalculateHelper.calAverage(fileHelperList.get(i).getMonthArrays());
+            average = CalculateHelper.toNormalArray(fileHelperList.get(i).getSingleMonthArray().reduce());
+
             averageList.add(average);
         }
 

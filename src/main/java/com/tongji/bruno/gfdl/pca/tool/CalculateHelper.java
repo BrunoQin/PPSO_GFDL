@@ -33,15 +33,22 @@ public class CalculateHelper {
         for(int i = 0; i < averageList.size(); i++){
             for(int j = 0; j < row; j++){
                 for(int k = 0; k < col; k++){
+                    if(averageList.get(i)[j][k] >= 9E36){
+                        averageList.get(i)[j][k] = 0;
+                    }
                     composedMatrix.set(k * row + j, i, averageList.get(i)[j][k]);
                 }
             }
         }
 
+        System.out.println(averageList.get(0)[0][0]);
+        System.out.println(composedMatrix.getRowDimension());
+        System.out.println(composedMatrix.getColumnDimension());
+
         return composedMatrix.svd();
     }
 
-    private static double[][] toNormalArray(Array data){
+    public static double[][] toNormalArray(Array data){
 
         double[][] sstaMatrix;
 

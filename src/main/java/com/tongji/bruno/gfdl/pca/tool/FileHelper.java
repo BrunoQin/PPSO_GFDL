@@ -14,30 +14,50 @@ import java.util.List;
  */
 public class FileHelper {
 
-    private static final String fileName = Constants.DATA_PATH + "ssta_100year(all).nc";
+    private static final String fileName = Constants.DATA_PATH + "ssta_300Y.nc";
     private static final String parameter = "ssta";
 
     private int year;
+    private int n;
     private List<Array> monthArrays;
+    private Array singleMonthArray;
 
-    public FileHelper(int year){
-        this.year = year;
-        this.monthArrays = new ArrayList<Array>();
+//    public FileHelper(int year){
+//        this.year = year;
+//        this.monthArrays = new ArrayList<Array>();
+//        try {
+//            NetcdfFile ncfile = NetcdfDataset.open(fileName);
+//
+//            Variable sst = ncfile.findVariable(parameter);
+//            for(int i = 0; i < 12; i++){
+//                Array part = sst.read(year * 12 + i + ":" + (int)(year * 12 + i) + ":1, 0:199:1, 0:359:1");
+//                this.monthArrays.add(part);
+//            }
+//
+//        } catch (Exception e){
+//            e.printStackTrace();
+//        }
+    public FileHelper(int n){
+        this.n = n;
         try {
             NetcdfFile ncfile = NetcdfDataset.open(fileName);
 
             Variable sst = ncfile.findVariable(parameter);
-            for(int i = 0; i < 12; i++){
-                Array part = sst.read(year * 12 + i + ":" + (int)(year * 12 + i) + ":1, 0:199:1, 0:359:1");
-                this.monthArrays.add(part);
-            }
+            Array part = sst.read(n + ":" + n + ":1, 0:199:1, 0:359:1");
+            System.out.println(part.reduce().getDouble(part.reduce().getIndex().set(10, 10)));
+            this.singleMonthArray = part;
 
         } catch (Exception e){
             e.printStackTrace();
         }
+
     }
 
     public List<Array> getMonthArrays() {
         return monthArrays;
+    }
+
+    public Array getSingleMonthArray() {
+        return singleMonthArray;
     }
 }

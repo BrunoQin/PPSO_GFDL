@@ -4,12 +4,16 @@ import Jama.Matrix;
 import com.tongji.bruno.gfdl.Constants;
 import com.tongji.bruno.gfdl.ppso.tool.FileHelper;
 import com.tongji.bruno.gfdl.ppso.tool.ShellHelper;
+import com.tongji.bruno.gfdl.ppso.tool.ThreadHelper;
 import ucar.ma2.Array;
 import ucar.ma2.Index;
 import ucar.nc2.NetcdfFile;
 import ucar.nc2.Variable;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.security.spec.ECField;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +24,9 @@ import java.util.List;
 public class PPSO {
 
     private static final int PCACOUNT = 80;
-    private static final int STEP = 4;
+    private static final int STEP = 2;
+
+    private List<ThreadHelper> threadHelpers;
 
     private Matrix lambdaMatrix; //主成分
 
@@ -57,7 +63,7 @@ public class PPSO {
             for(int j = 0; j < PCACOUNT; j++){
                 mod.set(j, 0, 0.5);
             }
-            Matrix temp = Matrix.random(PCACOUNT, 1).minus(mod).times(2.0);
+            Matrix temp = Matrix.random(PCACOUNT, 1).minus(mod).times(35.0);
             this.swarmMatrices.add(temp);
             for(int j = 0; j < PCACOUNT; j++){
                 FileHelper.writeFile(Double.toString(temp.get(j, 0)), Constants.RESOURCE_PATH + i + "/" + i + ".txt");
@@ -77,7 +83,8 @@ public class PPSO {
     public boolean isLegal(int num){
         double[][] tem = new double[80][1];
         for(int j = 0; j < 80; j++){
-            tem[j][0] = FileHelper.readFile(Constants.RESOURCE_PATH + num + "/" + num + ".txt")[j];
+//            tem[j][0] = FileHelper.readFile(Constants.RESOURCE_PATH + num + "/" + num + ".txt")[j];
+            tem[j][0] = this.swarmMatrices.get(num).get(j, 0);
         }
 
         Matrix p = new Matrix(tem);
@@ -105,7 +112,7 @@ public class PPSO {
             for(int j = 0; j < PCACOUNT; j++){
                 mod.set(j, 0, 0.5);
             }
-            Matrix temp = Matrix.random(PCACOUNT, 1).minus(mod).times(0.1);
+            Matrix temp = Matrix.random(PCACOUNT, 1).minus(mod).times(4.0);
             this.swarmV.add(temp);
             for(int j = 0; j < PCACOUNT; j++){
                 FileHelper.writeFile(Double.toString(temp.get(j, 0)), Constants.RESOURCE_PATH + i + "/v" + i + ".txt");
@@ -132,31 +139,44 @@ public class PPSO {
         this.swarmGBest = this.swarmPBest.get(index);
 
         for(int i = 0; i < STEP; i++){
-            for(int j = 0; j < this.swarmCount; j++){
-                //准备文件
-                FileHelper.deleteFile(Constants.RESOURCE_PATH + j + "/" + j + ".txt");
-//                FileHelper.copyFile(Constants.DATA_PATH + "/ocean_temp_salt.res.nc", Constants.INPUT_PATH + "/ocean_temp_salt.res.nc", true);
-                FileHelper.prepareFile(j, this.lambdaMatrix.times(this.swarmMatrices.get(j)));
-                FileHelper.copyFile(Constants.RESOURCE_PATH + j + "/ocean_temp_salt_" + j + ".nc", Constants.INPUT_PATH + "/ocean_temp_salt.res.nc", true);
-                System.out.println("step " + i + " swarm " + j + " is running! good luck!!!");
-                //调脚本
-                System.out.println(ShellHelper.exec("bsub ./fr21.csh"));
-                while(true){
-                    try{
-                        Thread.sleep(1000 * 60 * 5);
-                        String tem = ShellHelper.exec("bjobs");
-                        if(tem.equals("")){
-                            System.out.println("step " + i + " swarm " + j + " finish! ");
-                            break;
-                        } else {
-                            System.out.println("Not Yet!");
-                        }
-                    } catch (Exception e){
-                        e.printStackTrace();
-                    }
 
+            this.threadHelpers = new ArrayList<ThreadHelper>();
+
+            //准备文件
+            for(int j = 0; j < this.swarmCount; j++){
+                FileHelper.prepareFile(j, this.lambdaMatrix.times(this.swarmMatrices.get(j)));
+                FileHelper.copyFile(Constants.RESOURCE_PATH + j + "/ocean_temp_salt_" + j + ".nc", Constants.ROOT_PATH + j + "/CM2.1p1/INPUT/ocean_temp_salt.res.nc", true);
+                ThreadHelper threadHelper = new ThreadHelper(j + "");
+                this.threadHelpers.add(threadHelper);
+            }
+
+            //并行运行
+            for(int j = 0; j < this.swarmCount; j++){
+                this.threadHelpers.get(j).start();
+                System.out.println("step " + i + " swarm " + j + " is running! good luck!!!");
+            }
+
+            this.threadHelpers.clear();
+
+            //判断完成
+            while(true) {
+                try {
+                    Thread.sleep(1000 * 60 * 6);
+                    String tem = ShellHelper.exec("bjobs");
+                    if (tem.equals("")) {
+                        System.out.println("step " + i + " finish! ");
+                        break;
+                    } else {
+                        System.out.println("Not Yet!");
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-                double currentAdapt = adaptValue();
+            }
+
+            //计算适应度值
+            for(int j = 0; j < this.swarmCount; j++) {
+                double currentAdapt = adaptValue(j);
                 //更新粒子个体最优矩阵和值
                 if(currentAdapt > this.swarmPBestValue[j]){
                     this.swarmPBestValue[j] = currentAdapt;
@@ -165,25 +185,30 @@ public class PPSO {
                 FileHelper.writeFile("第" + i + "步第" + j + "个粒子" + Double.toString(this.swarmPBestValue[j]), Constants.RESOURCE_PATH  + "best.txt");
                 System.out.println("step " + i + " swarm " + j + " is cleaning! ");
 
-                //善后工作，初始化运行条件以便后面工作
-                FileHelper.deleteDirectory(Constants.OUTPUT_PATH + "ascii");
-                FileHelper.deleteDirectory(Constants.OUTPUT_PATH + "history");
-                FileHelper.deleteDirectory(Constants.OUTPUT_PATH + "RESTART");
-                FileHelper.deleteFile(Constants.OUTPUT_PATH + "data_table");
-                FileHelper.deleteFile(Constants.OUTPUT_PATH + "diag_table");
-                FileHelper.deleteFile(Constants.OUTPUT_PATH + "field_table");
-                FileHelper.deleteFile(Constants.OUTPUT_PATH + "input.nml");
+                FileHelper.copyFile(Constants.ROOT_PATH + j + "/CM2.1p1/INPUT/history/01310101.ocean_month.nc", Constants.RESOURCE_PATH + i + "_" + j + "_ocean.nc", true);
+                FileHelper.copyFile(Constants.ROOT_PATH + j + "/CM2.1p1/INPUT/history/01310101.atmosphere_month.nc", Constants.RESOURCE_PATH + i + "_" + j + "_atmosphere.nc", true);
 
-                FileHelper.deleteFile(Constants.EXP_PATH + "CM2.1p1.output.tar.gz");
-                FileHelper.deleteFile(Constants.EXP_PATH + "fms.out");
+                //善后工作，初始化运行条件以便后面工作
+                FileHelper.deleteDirectory(Constants.ROOT_PATH + j + "/CM2.1p1/ascii");
+                FileHelper.deleteDirectory(Constants.ROOT_PATH + j + "/CM2.1p1/history");
+                FileHelper.deleteDirectory(Constants.ROOT_PATH + j + "/CM2.1p1/RESTART");
+                FileHelper.deleteFile(Constants.ROOT_PATH + j + "/CM2.1p1/data_table");
+                FileHelper.deleteFile(Constants.ROOT_PATH + j + "/CM2.1p1/diag_table");
+                FileHelper.deleteFile(Constants.ROOT_PATH + j + "/CM2.1p1/field_table");
+                FileHelper.deleteFile(Constants.ROOT_PATH + j + "/CM2.1p1/input.nml");
+
+                FileHelper.deleteFile(Constants.ROOT_PATH + j + "/exp/CM2.1p1.output.tar.gz");
+                FileHelper.deleteFile(Constants.ROOT_PATH + j + "/exp/fms.out");
 
             }
+
             index = getMaxIndex(this.swarmPBestValue);
             //更新粒子群体最优矩阵和值
             if(this.swarmGBestValue > this.swarmPBestValue[index]){
                 this.swarmGBestValue = this.swarmPBestValue[index];
                 this.swarmGBest = this.swarmPBest.get(index);
             }
+
             //寻步
             for(int j = 0; j < this.swarmCount; j++){
                 advanceStep(j);
@@ -193,17 +218,17 @@ public class PPSO {
         return null;
     }
 
-    public double adaptValue(){
+    public double adaptValue(int order){
 
         NetcdfFile ncfile = null;
         try {
-            ncfile = NetcdfFile.open(Constants.HISTORY_PATH + "00510301.ocean_month.nc");
+            ncfile = NetcdfFile.open(Constants.ROOT_PATH + order + "/CM2.1p1/INPUT/history/01310101.ocean_month.nc");
 
             //处理restart文件获得adaptValue
             //计算（sst-sst'）平方求和 该值即为适应度值
             try{
                 Variable sst = ncfile.findVariable("sst");
-                Array part = sst.read("0:0:1, 0:199:1, 0:359:1");
+                Array part = sst.read("8:8:1, 0:199:1, 0:359:1");
                 Index index = part.reduce().getIndex();
                 double[][] tem = new double[200][360];
                 double adapt = 0;
