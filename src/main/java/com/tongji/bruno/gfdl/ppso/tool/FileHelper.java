@@ -135,8 +135,11 @@ public class FileHelper {
             for(int i = 0; i < 200; i++){
                 for(int j = 0; j < 360; j++){
                     //读取第九个月的数据
-                    if(part.getDouble(index.set(i, j)) >= 9E36 )
-                    temp[i][j] = part.getDouble(index.set(i, j));
+                    if(part.getDouble(index.set(i, j)) >= 9E36 ){
+                        temp[i][j] = 0;
+                    } else {
+                        temp[i][j] = part.getDouble(index.set(i, j));
+                    }
                 }
             }
 

@@ -24,7 +24,7 @@ import java.util.List;
 public class PPSO {
 
     private static final int PCACOUNT = 80;
-    private static final int STEP = 2;
+    private static final int STEP = 20;
 
     private List<ThreadHelper> threadHelpers;
 
@@ -42,7 +42,6 @@ public class PPSO {
 
     private double c1 = 0.8, c2 = 0.8;
     private double w = 2;
-
 
     public PPSO(int swarmCount, Matrix lambdaMatrix){
         this.swarmCount = swarmCount;
@@ -63,7 +62,7 @@ public class PPSO {
             for(int j = 0; j < PCACOUNT; j++){
                 mod.set(j, 0, 0.5);
             }
-            Matrix temp = Matrix.random(PCACOUNT, 1).minus(mod).times(35.0);
+            Matrix temp = Matrix.random(PCACOUNT, 1).minus(mod).times(70.0);
             this.swarmMatrices.add(temp);
             for(int j = 0; j < PCACOUNT; j++){
                 FileHelper.writeFile(Double.toString(temp.get(j, 0)), Constants.RESOURCE_PATH + i + "/" + i + ".txt");
@@ -93,11 +92,11 @@ public class PPSO {
         double[][] sigma = FileHelper.getSigma();
         double sum = 0.0;
         for(int j = 0; j < 200; j++){
-            for(int k = 0; k < 360; k++){
+            for(int k = 40; k < 221; k++){
                 sum += Math.pow(Math.cos(lat[j]) * p.get(k * 200 + j, 0) / sigma[j][k], 2);
             }
         }
-        if (Math.sqrt(sum) > 150){
+        if (Math.sqrt(sum) > 330){
             return false;
         }
         return true;
@@ -112,7 +111,7 @@ public class PPSO {
             for(int j = 0; j < PCACOUNT; j++){
                 mod.set(j, 0, 0.5);
             }
-            Matrix temp = Matrix.random(PCACOUNT, 1).minus(mod).times(4.0);
+            Matrix temp = Matrix.random(PCACOUNT, 1).minus(mod).times(8.0);
             this.swarmV.add(temp);
             for(int j = 0; j < PCACOUNT; j++){
                 FileHelper.writeFile(Double.toString(temp.get(j, 0)), Constants.RESOURCE_PATH + i + "/v" + i + ".txt");
@@ -185,8 +184,9 @@ public class PPSO {
                 FileHelper.writeFile("step" + i + "swarm" + j + "---" + Double.toString(this.swarmPBestValue[j]), Constants.RESOURCE_PATH  + "best.txt");
                 System.out.println("step " + i + " swarm " + j + " is cleaning! ");
 
+                FileHelper.copyFile(Constants.ROOT_PATH + j + "/CM2.1p1/INPUT/ocean_temp_salt.res.nc", Constants.RESOURCE_PATH + i + "_" + j + "_origin.nc", true);
                 FileHelper.copyFile(Constants.ROOT_PATH + j + "/CM2.1p1/history/01310101.ocean_month.nc", Constants.RESOURCE_PATH + i + "_" + j + "_ocean.nc", true);
-                FileHelper.copyFile(Constants.ROOT_PATH + j + "/CM2.1p1/history/01310101.atmosphere_month.nc", Constants.RESOURCE_PATH + i + "_" + j + "_atmosphere.nc", true);
+                FileHelper.copyFile(Constants.ROOT_PATH + j + "/CM2.1p1/history/01310101.atmos_month.nc", Constants.RESOURCE_PATH + i + "_" + j + "_atmosphere.nc", true);
 
                 //善后工作，初始化运行条件以便后面工作
                 FileHelper.deleteDirectory(Constants.ROOT_PATH + j + "/CM2.1p1/ascii");
@@ -233,7 +233,7 @@ public class PPSO {
                 double[][] tem = new double[200][360];
                 double adapt = 0;
                 for(int j = 0; j < 200; j++){
-                    for(int k = 0; k < 360; k++){
+                    for(int k = 40; k < 221; k++){
                         tem[j][k] = part.reduce().getDouble(index.set(j, k)) - outputMatrix.get(j, k);
                         adapt += Math.pow(tem[j][k], 2);
                     }

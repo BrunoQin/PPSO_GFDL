@@ -41,9 +41,9 @@ public class CalculateHelper {
             }
         }
 
-        System.out.println(averageList.get(0)[0][0]);
-        System.out.println(composedMatrix.getRowDimension());
-        System.out.println(composedMatrix.getColumnDimension());
+//        System.out.println(averageList.get(0)[0][0]);
+//        System.out.println(composedMatrix.getRowDimension());
+//        System.out.println(composedMatrix.getColumnDimension());
 
         return composedMatrix.svd();
     }
