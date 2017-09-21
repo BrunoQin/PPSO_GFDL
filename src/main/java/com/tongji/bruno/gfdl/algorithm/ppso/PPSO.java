@@ -33,6 +33,7 @@ public class PPSO {
     private Matrix outputMatrix; //平均态
 
     private int swarmCount; //粒子数量
+    private int modelCount; //模式数量
     private List<Matrix> swarmMatrices; //粒子群当前位置
     private List<Matrix> swarmPBest; //粒子个体极值位置
     private double[] swarmPBestValue; //粒子群个体极值
@@ -43,8 +44,9 @@ public class PPSO {
     private double c1 = 0.8, c2 = 0.8;
     private double w = 2;
 
-    public PPSO(int swarmCount, Matrix lambdaMatrix){
+    public PPSO(int swarmCount, int modelCount, Matrix lambdaMatrix){
         this.swarmCount = swarmCount;
+        this.modelCount = modelCount;
         this.lambdaMatrix = lambdaMatrix;
         this.outputMatrix = FileHelper.readRestartFile();
     }
@@ -139,67 +141,70 @@ public class PPSO {
 
         for(int i = 0; i < STEP; i++){
 
-            this.threadHelpers = new ArrayList<ThreadHelper>();
+            for(int p = 0; p < this.swarmCount / this.modelCount; p++){
 
-            //准备文件
-            for(int j = 0; j < this.swarmCount; j++){
-                FileHelper.prepareFile(j, this.lambdaMatrix.times(this.swarmMatrices.get(j)));
-                FileHelper.copyFile(Constants.RESOURCE_PATH + j + "/ocean_temp_salt_" + j + ".nc", Constants.ROOT_PATH + j + "/CM2.1p1/INPUT/ocean_temp_salt.res.nc", true);
-                ThreadHelper threadHelper = new ThreadHelper(j + "");
-                this.threadHelpers.add(threadHelper);
-            }
+                this.threadHelpers = new ArrayList<ThreadHelper>();
 
-            //并行运行
-            for(int j = 0; j < this.swarmCount; j++){
-                this.threadHelpers.get(j).start();
-                System.out.println("step " + i + " swarm " + j + " is running! good luck!!!");
-            }
+                //准备文件
+                for(int j = 0; j < this.modelCount; j++){
+                    FileHelper.prepareFile(j, this.lambdaMatrix.times(this.swarmMatrices.get(j)));
+                    FileHelper.copyFile(Constants.RESOURCE_PATH + j + "/ocean_temp_salt_" + j + ".nc", Constants.ROOT_PATH + j + "/CM2.1p1/INPUT/ocean_temp_salt.res.nc", true);
+                    ThreadHelper threadHelper = new ThreadHelper(j + "");
+                    this.threadHelpers.add(threadHelper);
+                }
 
-            this.threadHelpers.clear();
+                //并行运行
+                for(int j = 0; j < this.modelCount; j++){
+                    this.threadHelpers.get(j).start();
+                    System.out.println("step " + i + " swarm " + j + " is running! good luck!!!");
+                }
 
-            //判断完成
-            while(true) {
-                try {
-                    Thread.sleep(1000 * 60 * 6);
-                    String tem = ShellHelper.exec("bjobs");
-                    if (tem.equals("")) {
-                        System.out.println("step " + i + " finish! ");
-                        break;
-                    } else {
-                        System.out.println("Not Yet!");
+                this.threadHelpers.clear();
+
+                //判断完成
+                while(true) {
+                    try {
+                        Thread.sleep(1000 * 60 * 6);
+                        String tem = ShellHelper.exec("bjobs");
+                        if (tem.equals("")) {
+                            System.out.println("step " + i + " finish! ");
+                            break;
+                        } else {
+                            System.out.println("Not Yet!");
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
-            }
 
-            //计算适应度值
-            for(int j = 0; j < this.swarmCount; j++) {
-                double currentAdapt = adaptValue(j);
-                //更新粒子个体最优矩阵和值
-                if(currentAdapt > this.swarmPBestValue[j]){
-                    this.swarmPBestValue[j] = currentAdapt;
-                    this.swarmPBest.set(j, this.swarmMatrices.get(j));
+                //计算适应度值
+                for(int j = 0; j < this.modelCount; j++) {
+                    double currentAdapt = adaptValue(j);
+                    //更新粒子个体最优矩阵和值
+                    if(currentAdapt > this.swarmPBestValue[j]){
+                        this.swarmPBestValue[j] = currentAdapt;
+                        this.swarmPBest.set(j, this.swarmMatrices.get(j));
+                    }
+                    FileHelper.writeFile("step" + i + "swarm" + j + "---" + Double.toString(this.swarmPBestValue[j]), Constants.RESOURCE_PATH  + "best.txt");
+                    System.out.println("step " + i + " swarm " + j + " is cleaning! ");
+
+                    FileHelper.copyFile(Constants.ROOT_PATH + j + "/CM2.1p1/INPUT/ocean_temp_salt.res.nc", Constants.RESOURCE_PATH + i + "_" + j + "_origin.nc", true);
+                    FileHelper.copyFile(Constants.ROOT_PATH + j + "/CM2.1p1/history/01310101.ocean_month.nc", Constants.RESOURCE_PATH + i + "_" + j + "_ocean.nc", true);
+                    FileHelper.copyFile(Constants.ROOT_PATH + j + "/CM2.1p1/history/01310101.atmos_month.nc", Constants.RESOURCE_PATH + i + "_" + j + "_atmosphere.nc", true);
+
+                    //善后工作，初始化运行条件以便后面工作
+                    FileHelper.deleteDirectory(Constants.ROOT_PATH + j + "/CM2.1p1/ascii");
+                    FileHelper.deleteDirectory(Constants.ROOT_PATH + j + "/CM2.1p1/history");
+                    FileHelper.deleteDirectory(Constants.ROOT_PATH + j + "/CM2.1p1/RESTART");
+                    FileHelper.deleteFile(Constants.ROOT_PATH + j + "/CM2.1p1/data_table");
+                    FileHelper.deleteFile(Constants.ROOT_PATH + j + "/CM2.1p1/diag_table");
+                    FileHelper.deleteFile(Constants.ROOT_PATH + j + "/CM2.1p1/field_table");
+                    FileHelper.deleteFile(Constants.ROOT_PATH + j + "/CM2.1p1/input.nml");
+
+                    FileHelper.deleteFile(Constants.ROOT_PATH + j + "/exp/CM2.1p1.output.tar.gz");
+                    FileHelper.deleteFile(Constants.ROOT_PATH + j + "/exp/fms.out");
+
                 }
-                FileHelper.writeFile("step" + i + "swarm" + j + "---" + Double.toString(this.swarmPBestValue[j]), Constants.RESOURCE_PATH  + "best.txt");
-                System.out.println("step " + i + " swarm " + j + " is cleaning! ");
-
-                FileHelper.copyFile(Constants.ROOT_PATH + j + "/CM2.1p1/INPUT/ocean_temp_salt.res.nc", Constants.RESOURCE_PATH + i + "_" + j + "_origin.nc", true);
-                FileHelper.copyFile(Constants.ROOT_PATH + j + "/CM2.1p1/history/01310101.ocean_month.nc", Constants.RESOURCE_PATH + i + "_" + j + "_ocean.nc", true);
-                FileHelper.copyFile(Constants.ROOT_PATH + j + "/CM2.1p1/history/01310101.atmos_month.nc", Constants.RESOURCE_PATH + i + "_" + j + "_atmosphere.nc", true);
-
-                //善后工作，初始化运行条件以便后面工作
-                FileHelper.deleteDirectory(Constants.ROOT_PATH + j + "/CM2.1p1/ascii");
-                FileHelper.deleteDirectory(Constants.ROOT_PATH + j + "/CM2.1p1/history");
-                FileHelper.deleteDirectory(Constants.ROOT_PATH + j + "/CM2.1p1/RESTART");
-                FileHelper.deleteFile(Constants.ROOT_PATH + j + "/CM2.1p1/data_table");
-                FileHelper.deleteFile(Constants.ROOT_PATH + j + "/CM2.1p1/diag_table");
-                FileHelper.deleteFile(Constants.ROOT_PATH + j + "/CM2.1p1/field_table");
-                FileHelper.deleteFile(Constants.ROOT_PATH + j + "/CM2.1p1/input.nml");
-
-                FileHelper.deleteFile(Constants.ROOT_PATH + j + "/exp/CM2.1p1.output.tar.gz");
-                FileHelper.deleteFile(Constants.ROOT_PATH + j + "/exp/fms.out");
-
             }
 
             index = getMaxIndex(this.swarmPBestValue);

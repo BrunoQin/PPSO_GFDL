@@ -40,7 +40,7 @@ public class PPSO_main {
 
         System.out.println("pca finish!");
 
-        PPSO ppso = new PPSO(6, lambdaMatrix);
+        PPSO ppso = new PPSO(54, 6, lambdaMatrix);
         List<Matrix> swarmMatrices = ppso.initSwarm();
         List<Matrix> swarmV = ppso.initV();
         Matrix gbest = ppso.seek();
