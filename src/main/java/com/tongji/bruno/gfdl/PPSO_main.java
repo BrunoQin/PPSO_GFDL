@@ -14,8 +14,7 @@ import ucar.nc2.Dimension;
 import ucar.nc2.NetcdfFileWriteable;
 import ucar.nc2.Variable;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.List;
 
 /**
@@ -27,27 +26,27 @@ public class PPSO_main {
         System.out.println("hello world!");
 
         //===================主体======================
-        PCA pca = new PCA();
-        SingularValueDecomposition i = pca.getLeftU();
-
-        Matrix u = i.getU();
-
-        int row = u.getRowDimension();
-        Matrix lambdaMatrix = new Matrix(row, 80);
-        for(int k = 0; k < 80; k++){
-            lambdaMatrix.setMatrix(0, row - 1, k, k, u.getMatrix(0, row - 1, k, k));
-        }
-
-        System.out.println("pca finish!");
-
-        PPSO ppso = new PPSO(54, 6, lambdaMatrix);
-        List<Matrix> swarmMatrices = ppso.initSwarm();
-        List<Matrix> swarmV = ppso.initV();
-        Matrix gbest = ppso.seek();
-
-        for(int k = 0; k < 80; k++){
-            FileHelper.writeFile(Double.toString(gbest.get(k, 0)), Constants.RESOURCE_PATH  + "best.txt");
-        }
+//        PCA pca = new PCA();
+//        SingularValueDecomposition i = pca.getLeftU();
+//
+//        Matrix u = i.getU();
+//
+//        int row = u.getRowDimension();
+//        Matrix lambdaMatrix = new Matrix(row, 80);
+//        for(int k = 0; k < 80; k++){
+//            lambdaMatrix.setMatrix(0, row - 1, k, k, u.getMatrix(0, row - 1, k, k));
+//        }
+//
+//        System.out.println("pca finish!");
+//
+//        PPSO ppso = new PPSO(54, 6, lambdaMatrix);
+//        List<Matrix> swarmMatrices = ppso.initSwarm();
+//        List<Matrix> swarmV = ppso.initV();
+//        Matrix gbest = ppso.seek();
+//
+//        for(int k = 0; k < 80; k++){
+//            FileHelper.writeFile(Double.toString(gbest.get(k, 0)), Constants.RESOURCE_PATH  + "best.txt");
+//        }
         //===================主体======================
 
 //        try{
@@ -97,7 +96,57 @@ public class PPSO_main {
 //            e.printStackTrace();
 //        }
 
+        String tem = ShellHelper.exec("/usr/bin/yhqueue");
+        System.out.println(tem);
+        System.out.println(tem.contains("fr21.csh"));
+        new PPSO_main().exec("yhq");
+        ShellHelper.callScript("yhq", "", "/HOME/iocas_mmu_2/BIGDATA/90/exp");
+        tem = ShellHelper.exec("ls");
+        System.out.println(tem);
+        System.out.println("...");
 
+    }
+
+    public String executeLinuxCmd(String cmd) {
+        System.out.println("got cmd job : " + cmd);
+        Runtime run = Runtime.getRuntime();
+        try {
+            Process process = run.exec(cmd);
+            InputStream in = process.getInputStream();
+            BufferedReader bs = new BufferedReader(new InputStreamReader(in));
+            // System.out.println("[check] now size \n"+bs.readLine());
+            String result = null;
+            while (in.read() != -1) {
+                result = bs.readLine();
+                System.out.println("job result [" + result + "]");
+            }
+            in.close();
+            // process.waitFor();
+            process.destroy();
+            return result;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static Object exec(String cmd) {
+        try {
+            String[] cmdA = { "/bin/sh", "-c", cmd };
+            Process process = Runtime.getRuntime().exec(cmdA);
+            LineNumberReader br = new LineNumberReader(new InputStreamReader(
+                    process.getInputStream()));
+            StringBuffer sb = new StringBuffer();
+            String line;
+            while ((line = br.readLine()) != null) {
+                System.out.println(line);
+                sb.append(line).append("\n");
+            }
+            return sb.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }
