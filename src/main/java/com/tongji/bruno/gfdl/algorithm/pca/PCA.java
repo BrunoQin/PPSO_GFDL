@@ -2,6 +2,7 @@ package com.tongji.bruno.gfdl.algorithm.pca;
 
 import Jama.Matrix;
 import Jama.SingularValueDecomposition;
+import com.tongji.bruno.gfdl.Constants;
 import com.tongji.bruno.gfdl.pca.tool.CalculateHelper;
 import com.tongji.bruno.gfdl.pca.tool.FileHelper;
 import ucar.ma2.Array;
@@ -14,7 +15,7 @@ import java.util.List;
  */
 public class PCA {
 
-    private static final int YEAR = 300;
+    private static final int YEAR = Constants.YEAR;
 
     private SingularValueDecomposition leftU;
 

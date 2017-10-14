@@ -17,7 +17,7 @@ import java.util.List;
 public class FileHelper {
 
     private static final String fileName = Constants.DATA_PATH + "ocean_temp_salt.res.nc";
-    private static final String RESTART_FILENAME = Constants.DATA_PATH + "sstclim_all.nc";
+    private static final String RESTART_FILENAME = Constants.DATA_PATH + "sst_clim.nc";
     private static final String PARAMETER = "temp";
 
     /**
@@ -75,12 +75,12 @@ public class FileHelper {
     public static double[][] getSigma(){
 
         try{
-            NetcdfFileWriteable ncfile = NetcdfFileWriteable.openExisting(Constants.DATA_PATH + "ssta_100year(all).nc");
+            NetcdfFileWriteable ncfile = NetcdfFileWriteable.openExisting(Constants.DATA_PATH + "ssta_300Y.nc");
             Variable sst = ncfile.findVariable("ssta");
-            double[][][] march = new double[100][200][360];
+            double[][][] startMonth = new double[300][200][360];
 
-            for(int i = 0; i < 100; i++){
-                Array part = sst.read(i * 12 + 2 + ":" + (i * 12 + 2) + ":1, 0:199:1, 0:359:1");
+            for(int i = 0; i < 300; i++){
+                Array part = sst.read((i * 12 + Constants.START_MONTH) + ":" + (i * 12 + Constants.START_MONTH) + ":1, 0:199:1, 0:359:1");
                 Index index = part.reduce().getIndex();
                 double[][] tem = new double[200][360];
                 for(int j = 0; j < 200; j++){
@@ -88,7 +88,7 @@ public class FileHelper {
                         tem[j][k] = part.reduce().getDouble(index.set(j, k));
                     }
                 }
-                march[i] = tem;
+                startMonth[i] = tem;
             }
 
             double[][] sigma = new double[200][360];
@@ -96,7 +96,7 @@ public class FileHelper {
                 for(int j = 0; j < 360; j++){
                     double[] tem = new double[100];
                     for(int k = 0; k < 100; k++){
-                        tem[k] = march[k][i][j];
+                        tem[k] = startMonth[k][i][j];
                     }
                     sigma[i][j] = getStandardDevition(tem);
                 }
@@ -114,7 +114,7 @@ public class FileHelper {
     public static double[] getLat(){
         try{
             NetcdfFile ncfile = null;
-            ncfile = NetcdfFile.open(Constants.DATA_PATH + "ssta_100year(all).nc");
+            ncfile = NetcdfFile.open(RESTART_FILENAME);
             Variable lat = ncfile.findVariable("yt_ocean");
             double[] tem = (double[]) lat.read().copyToNDJavaArray();
             return tem;
@@ -128,7 +128,7 @@ public class FileHelper {
         try{
             NetcdfFileWriteable ncfile = NetcdfFileWriteable.openExisting(RESTART_FILENAME);
 
-            Variable sst = ncfile.findVariable("sst");
+            Variable sst = ncfile.findVariable("sst_ave");
             Array part = sst.read("0:199:1, 0:359:1");
             double[][]  temp = new double[200][360];
             Index index = part.getIndex();
@@ -336,6 +336,42 @@ public class FileHelper {
             sum += Math.sqrt(((double)array[i] - average) * (array[i] - average));
         }
         return (sum / (array.length - 1));
+    }
+
+    public static String getOceanOutputFileName(int order) {
+        String path = Constants.ROOT_PATH + order + "/CM2.1p1/history/"; // 路径
+        File f = new File(path);
+        if (!f.exists()) {
+            System.out.println(path + " not exists");
+            return null;
+        }
+
+        File fa[] = f.listFiles();
+        for (int i = 0; i < fa.length; i++) {
+            File fs = fa[i];
+            if(fs.getName().contains("ocean")){
+                return fs.getName();
+            }
+        }
+        return null;
+    }
+
+    public static String getAtmosOutputFileName(int order) {
+        String path = Constants.ROOT_PATH + order + "/CM2.1p1/history/"; // 路径
+        File f = new File(path);
+        if (!f.exists()) {
+            System.out.println(path + " not exists");
+            return null;
+        }
+
+        File fa[] = f.listFiles();
+        for (int i = 0; i < fa.length; i++) {
+            File fs = fa[i];
+            if(fs.getName().contains("atmos")){
+                return fs.getName();
+            }
+        }
+        return null;
     }
 
 }

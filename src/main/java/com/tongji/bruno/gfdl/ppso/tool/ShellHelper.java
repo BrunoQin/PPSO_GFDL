@@ -40,7 +40,7 @@ public class ShellHelper {
             }
 //            String[] evnp = {};
 //            process = Runtime.getRuntime().exec(cmd, evnp, dir);
-            process = Runtime.getRuntime().exec(new String[]{"/bin/csh", "-c", cmd},null, dir);
+            process = Runtime.getRuntime().exec(new String[]{"/bin/sh", "-c", cmd},null, dir);
             BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String line = "";
             while ((line = input.readLine()) != null) {
