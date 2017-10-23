@@ -44,11 +44,17 @@ public class PPSO {
     private double c1 = 0.8, c2 = 0.8;
     private double w = 2;
 
+    double[] lat;
+    double[][] sigma;
+
     public PPSO(int swarmCount, int modelCount, Matrix lambdaMatrix){
         this.swarmCount = swarmCount;
         this.modelCount = modelCount;
         this.lambdaMatrix = lambdaMatrix;
         this.outputMatrix = FileHelper.readRestartFile();
+
+        this.lat = FileHelper.getLat();
+        this.sigma = FileHelper.getSigma();
     }
 
     /**
@@ -80,19 +86,16 @@ public class PPSO {
     }
 
     public double isLegal(int num){
-        double[][] tem = new double[80][1];
-        for(int j = 0; j < 80; j++){
+        double[][] tem = new double[PCACOUNT][1];
+        for(int j = 0; j < PCACOUNT; j++){
             tem[j][0] = this.swarmMatrices.get(num).get(j, 0);
         }
-
         Matrix p = new Matrix(tem);
         p = lambdaMatrix.times(p);
-        double[] lat = FileHelper.getLat();
-        double[][] sigma = FileHelper.getSigma();
         double sum = 0.0;
         for(int j = 0; j < 200; j++){
             for(int k = 40; k < 221; k++){
-                sum += Math.pow(Math.cos(lat[j]) * p.get(k * 200 + j, 0) / sigma[j][k], 2);
+                sum += Math.pow(Math.cos(this.lat[j]) * p.get(k * 200 + j, 0) / this.sigma[j][k], 2);
             }
         }
         return Math.sqrt(sum);
@@ -140,16 +143,9 @@ public class PPSO {
 
                 //准备文件
                 for(int j = 0; j < this.modelCount; j++){
-                    if(isLegal(id + j) > 330){
-                        double[][] tem = new double[80][1];
-                        for(int o = 0; o < 80; o++){
-                            tem[o][0] = this.swarmMatrices.get(id + j).get(o, 0);
-                        }
-                        Matrix l = new Matrix(tem);
-                        l = lambdaMatrix.times(l);
-                        double sum = isLegal(id + j);
-                        l = l.times(330 / sum);
-                        this.swarmMatrices.set(id + j, this.lambdaMatrix.inverse().times(l));
+                    double sum = isLegal(id + j);
+                    if(sum > 330){
+                        this.swarmMatrices.set(id + j, this.swarmMatrices.get(id + j).times(330 / sum));
                     }
                     FileHelper.prepareFile(j, this.lambdaMatrix.times(this.swarmMatrices.get(id + j)));
                     FileHelper.copyFile(Constants.RESOURCE_PATH + j + "/ocean_temp_salt_" + j + ".nc", Constants.ROOT_PATH + j + "/CM2.1p1/INPUT/ocean_temp_salt.res.nc", true);
@@ -168,9 +164,13 @@ public class PPSO {
                 //判断完成
                 while(true) {
                     try {
-                        Thread.sleep(1000 * 60 * 6);
-                        String tem = ShellHelper.exec("/usr/bin/yhqueue");
-                        if (!tem.contains("fr21.csh")) {
+                        Thread.sleep(1000 * 60 * 5);
+                        String tem_1 = ShellHelper.exec("/usr/bin/yhqueue");
+                        Thread.sleep(1000 * 60 * 2);
+                        String tem_2 = ShellHelper.exec("/usr/bin/yhqueue");
+                        Thread.sleep(1000 * 60 * 1);
+                        String tem_3 = ShellHelper.exec("/usr/bin/yhqueue");
+                        if (!tem_1.contains("fr21.csh") && !tem_2.contains("fr21.csh") && !tem_3.contains("fr21.csh")) {
                             System.out.println("step " + i + "group" + p + " finish! ");
                             break;
                         } else {
@@ -190,7 +190,7 @@ public class PPSO {
                         this.swarmPBestValue[id + j] = currentAdapt;
                         this.swarmPBest.set(id + j, this.swarmMatrices.get(id + j));
                     }
-                    FileHelper.writeFile("step" + i + "swarm" + (id + j) + "---" + Double.toString(this.swarmPBestValue[j]), Constants.RESOURCE_PATH  + "best.txt");
+                    FileHelper.writeFile("step" + i + "swarm" + (id + j) + "---" + Double.toString(this.swarmPBestValue[id + j]), Constants.RESOURCE_PATH  + "best.txt");
                     System.out.println("step " + i + " swarm " + (id + j) + " is cleaning! ");
 
                     FileHelper.copyFile(Constants.ROOT_PATH + j + "/CM2.1p1/INPUT/ocean_temp_salt.res.nc", Constants.RESOURCE_PATH + i + "_" + (id + j) + "_origin.nc", true);

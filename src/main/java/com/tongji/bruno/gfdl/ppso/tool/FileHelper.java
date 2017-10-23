@@ -246,7 +246,7 @@ public class FileHelper {
             System.out.println(ex.getStackTrace());
         }
 
-        double[] num = new double[80];
+        double[] num = new double[Constants.PCA_COUNT];
         for(int i = 0; i < list.size(); i = i + 2){
             num[i / 2] = Double.parseDouble(list.get(i));
         }
