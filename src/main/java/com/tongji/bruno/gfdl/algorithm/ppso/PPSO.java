@@ -240,12 +240,10 @@ public class PPSO {
                 Variable sst = ncfile.findVariable("sst");
                 Array part = sst.read("11:11:1, 0:199:1, 0:359:1");
                 Index index = part.reduce().getIndex();
-                double[][] tem = new double[200][360];
                 double adapt = 0;
-                for(int j = 0; j < 200; j++){
-                    for(int k = 40; k < 221; k++){
-                        tem[j][k] = part.reduce().getDouble(index.set(j, k)) - outputMatrix.get(j, k);
-                        adapt += Math.pow(tem[j][k], 2);
+                for(int j = 62; j < 130; j++){
+                    for(int k = 40; k < 200; k++){
+                        adapt += Math.pow(part.reduce().getDouble(index.set(j, k)) - outputMatrix.get(j, k), 2);
                 }
             }
 
