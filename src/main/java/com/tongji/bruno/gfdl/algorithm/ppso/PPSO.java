@@ -72,9 +72,9 @@ public class PPSO {
             for(int j = 0; j < PCACOUNT; j++){
                 mod.set(j, 0, 0.5);
             }
-            Matrix temp = Matrix.random(PCACOUNT, 1).minus(mod).times(70.0);
+            Matrix temp = Matrix.random(PCACOUNT, 1).minus(mod).times(44);
             this.swarmMatrices.add(temp);
-            if(isLegal(i) > 330){
+            if(isLegal(i) > Constants.CONTRAINT){
                 this.swarmMatrices.remove(temp);
                 i = i - 1;
                 continue;
@@ -144,8 +144,8 @@ public class PPSO {
                 //准备文件
                 for(int j = 0; j < this.modelCount; j++){
                     double sum = isLegal(id + j);
-                    if(sum > 330){
-                        this.swarmMatrices.set(id + j, this.swarmMatrices.get(id + j).times(330 / sum));
+                    if(sum > Constants.CONTRAINT){
+                        this.swarmMatrices.set(id + j, this.swarmMatrices.get(id + j).times(Constants.CONTRAINT / sum));
                     }
                     FileHelper.prepareFile(j, this.lambdaMatrix.times(this.swarmMatrices.get(id + j)));
                     FileHelper.copyFile(Constants.RESOURCE_PATH + j + "/ocean_temp_salt_" + j + ".nc", Constants.ROOT_PATH + j + "/CM2.1p1/INPUT/ocean_temp_salt.res.nc", true);
@@ -185,7 +185,7 @@ public class PPSO {
                 for(int j = 0; j < this.modelCount; j++) {
                     double currentAdapt = adaptValue(j);
                     //更新粒子个体最优矩阵和值
-                    FileHelper.writeFile("step" + i + "swarm" + (id + j) + "--- current adapt " + Double.toString(currentAdapt), Constants.RESOURCE_PATH  + "best.txt");
+                    FileHelper.writeFile("step" + i + "swarm" + (id + j) + "---current adapt " + Double.toString(currentAdapt), Constants.RESOURCE_PATH  + "best.txt");
                     if(currentAdapt > this.swarmPBestValue[id + j]){
                         this.swarmPBestValue[id + j] = currentAdapt;
                         this.swarmPBest.set(id + j, this.swarmMatrices.get(id + j));
