@@ -10,9 +10,9 @@ public class ShellTest {
 
     public static void main(String[] args) {
 
-        ShellHelper.callScript("command.csh", "2", Constants.RESOURCE_PATH);
-        String tem = ShellHelper.exec("/usr/bin/yhqueue");
-        System.out.println(tem.contains("fr21.csh"));
+//        ShellHelper.callScript("command.csh", "2", Constants.RESOURCE_PATH);
+//        String tem = ShellHelper.exec("/usr/bin/yhqueue");
+//        System.out.println(tem.contains("fr21.csh"));
 
     }
 

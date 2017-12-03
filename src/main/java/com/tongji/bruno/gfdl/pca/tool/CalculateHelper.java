@@ -12,54 +12,55 @@ import java.util.List;
  */
 public class CalculateHelper {
 
-    public static double[][] calAverage(List<Array> monthArrays){
-        int[] shape = monthArrays.get(0).reduce().getShape();
-        double[][] sum = new double[shape[0]][shape[1]];
-        Matrix sumMatrix = new Matrix(sum);
-        for(int i = 0; i < monthArrays.size(); i++){
-            Matrix subMatrix = new Matrix(toNormalArray(monthArrays.get(i)));
-            sumMatrix = sumMatrix.plus(subMatrix);
-        }
-        sumMatrix = sumMatrix.times((double)1/monthArrays.size());
-        sum = sumMatrix.getArray();
-        return sum;
-    }
+//    public static double[][] calAverage(List<Array> monthArrays){
+//        int[] shape = monthArrays.get(0).reduce().getShape();
+//        double[][] sum = new double[shape[0]][shape[1]];
+//        Matrix sumMatrix = new Matrix(sum);
+//        for(int i = 0; i < monthArrays.size(); i++){
+//            Matrix subMatrix = new Matrix(toNormalArray(monthArrays.get(i)));
+//            sumMatrix = sumMatrix.plus(subMatrix);
+//        }
+//        sumMatrix = sumMatrix.times((double)1/monthArrays.size());
+//        sum = sumMatrix.getArray();
+//        return sum;
+//    }
 
-    public static SingularValueDecomposition compose(List<double[][]> averageList, int year){
-        int row = averageList.get(0).length;
-        int col = averageList.get(0)[0].length;
-        double[][] composedArray = new double[row * col][year];
+    public static SingularValueDecomposition compose(List<double[][][]> averageList, int year){
+        int depth = averageList.get(0).length;
+        int row = averageList.get(0)[0].length;
+        int col = averageList.get(0)[0][0].length;
+        double[][] composedArray = new double[depth * row * col][year];
         Matrix composedMatrix = new Matrix(composedArray);
         for(int i = 0; i < averageList.size(); i++){
-            for(int j = 0; j < row; j++){
-                for(int k = 0; k < col; k++){
-                    if(averageList.get(i)[j][k] >= 9E36){
-                        averageList.get(i)[j][k] = 0;
+            for(int j = 0; j < depth; j++){
+                for(int k = 0; k < row; k++){
+                    for(int l = 0; l < col; l++){
+                        composedMatrix.set(j * row * col + l * row + k, i, averageList.get(i)[j][k][l]);
                     }
-                    composedMatrix.set(k * row + j, i, averageList.get(i)[j][k]);
                 }
             }
         }
 
-//        System.out.println(averageList.get(0)[0][0]);
-//        System.out.println(composedMatrix.getRowDimension());
-//        System.out.println(composedMatrix.getColumnDimension());
-
         return composedMatrix.svd();
     }
 
-    public static double[][] toNormalArray(Array data){
+    public static double[][][] toNormalArray(Array data){
 
-        double[][] sstaMatrix;
+        double[][][] sstaMatrix;
 
         data = data.reduce();
         int[] shape = data.getShape();
         Index index = data.getIndex();
-        sstaMatrix = new double[shape[0]][shape[1]];
-        for (int i=0; i < shape[0]; i++) {
+        sstaMatrix = new double[shape[0]][shape[1]][shape[2]];
+        for (int i = 0; i < shape[0]; i++) {
             for (int j = 0; j < shape[1]; j++) {
-                double ssta = data.getDouble(index.set(i, j));
-                sstaMatrix[i][j] = ssta;
+                for (int k = 0; k < shape[2]; k++) {
+                    if(data.getDouble(index.set(i, j, k)) >= 9E36){
+                        sstaMatrix[i][j][k] = 0;
+                    }else{
+                        sstaMatrix[i][j][k] = data.getDouble(index.set(i, j, k));
+                    }
+                }
             }
         }
         return sstaMatrix;

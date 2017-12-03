@@ -1,8 +1,6 @@
-package com.tongji.bruno.gfdl;
+package com.tongji.bruno.gfdl.test;
 
-import Jama.Matrix;
-import com.tongji.bruno.gfdl.algorithm.pca.PCA;
-import com.tongji.bruno.gfdl.pca.tool.CalculateHelper;
+import com.tongji.bruno.gfdl.Constants;
 import com.tongji.bruno.gfdl.ppso.tool.FileHelper;
 import ucar.ma2.Array;
 import ucar.nc2.NetcdfFile;
@@ -16,37 +14,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by 秦博 on 2017/3/22.
+ * Created by 秦博 on 2017/12/3.
  */
-public class PPSO_main {
+public class SigmaTest {
 
-    public static void main(String[] args){
-        System.out.println("hello world!");
-
-        //===================主体======================
-//        PCA pca = new PCA();
-//
-//        Matrix lambdaMatrix = new Matrix(pca.getPCA());
-//        lambdaMatrix = lambdaMatrix.transpose();
-//        System.out.println("pca finish!");
-//
-//        PPSO ppso = new PPSO(30, 10, lambdaMatrix);
-//        List<Matrix> swarmMatrices = ppso.initSwarm();
-//        List<Matrix> swarmV = ppso.initV();
-//        Matrix gbest = ppso.seek();
-//
-//        for(int k = 0; k < Constants.PCA_COUNT; k++){
-//            FileHelper.writeFile(Double.toString(gbest.get(k, 0)), Constants.RESOURCE_PATH  + "best.txt");
-//        }
-        //===================主体======================
-
-//        FileHelper.createDir(Constants.RESOURCE_PATH + 0);
-//        Matrix mod = new Matrix(Constants.PCA_COUNT, 1);
-//        for(int j = 0; j < Constants.PCA_COUNT; j++){
-//            mod.set(j, 0, 0.5);
-//        }
-//        Matrix temp = Matrix.random(Constants.PCA_COUNT, 1).minus(mod).times(5E30);
-//        FileHelper.prepareFile(0, lambdaMatrix.times(temp));
+    public static void main(String[] args) {
 
         String fileName = Constants.DATA_PATH + "ta300Y_Lev21.nc";
         String parameter = "ta";
@@ -57,12 +29,6 @@ public class PPSO_main {
             NetcdfFile ncfile = NetcdfDataset.open(fileName);
 
             Variable sst = ncfile.findVariable(parameter);
-//            for(int i = 0; i < 3600; i++){
-//                Array part = sst.read(i + ":" + i + ":1, 0:20:1, 0:199:1, 0:179:1");
-//                data.add(CalculateHelper.toNormalArray(part.reduce()));
-//            }
-//            ncfile.close();
-
             double[][][] sigma = new double[21][200][180];
 
             for(int i = 0; i < 21; i++){
@@ -70,7 +36,6 @@ public class PPSO_main {
                     for(int k = 0; k < 180; k++){
                         double[] tem = new double[3600];
                         for(int l = 0; l < 3600; l++){
-//                            tem[l] = data.get(l)[i][j][k];
                             Array part = sst.read(l + ":" + l + ":1," + i + ":" + i + ":1," + j + ":" + j + ":1," + k + ":" + k + ":1,");
                             if(part.getDouble(0) >= 9E36){
                                 tem[l] = 0;

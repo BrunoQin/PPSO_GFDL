@@ -9,22 +9,26 @@ import java.io.InputStreamReader;
  */
 public class ShellHelper {
 
-    public static String exec(String cmd){
+    public static Boolean exec(String cmd){
         Process process = null;
         try {
             process = Runtime.getRuntime().exec(cmd);
             BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String line = "";
-            String results = "";
+            int i = 0;
             while ((line = input.readLine()) != null) {
-                results += line;
+                if(line.contains("fr21.csh")){
+                    if(line.contains("R")){
+                        return false;
+                    }
+                }
             }
             input.close();
-            return results;
+            return true;
         } catch (Exception e) {
             System.out.println("blank");
             e.printStackTrace();
-            return "error";
+            return false;
         }
 
     }

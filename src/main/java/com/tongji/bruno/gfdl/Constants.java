@@ -10,8 +10,9 @@ public class Constants {
     public static final String DATA_PATH = RESOURCE_PATH + "data/";
     public static final int CONTRAINT = 150;
     public static final int YEAR = 300;
-    public static final int PCA_COUNT = 156;
+    public static final int PCA_COUNT = 165;
     public static final int STEP = 20;
     public static final int START_MONTH = 0;
+    public static final int ROW = 756000;
 
 }

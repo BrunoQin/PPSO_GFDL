@@ -40,23 +40,16 @@ public class FileHelper {
             ArrayDouble sstaArray = new ArrayDouble.D4(time.getLength(), zaxis.getLength(), yaxis.getLength(), xaxis.getLength());
             Index index = sstaArray.getIndex();
             Variable varBean = ncfile.findVariable(PARAMETER);
-            Array origin = varBean.read();
-            for(int i = 0; i < 200; i++){
-                for(int j = 0; j < 360; j++){
-                    for(int k = 0; k < 50; k++){
-                        if(k == 0){
-                            Array tem = varBean.read("0:0:1, "+ k + ":" + k + ":1, " + i + ":" + i + ":1, " + j + ":" + j + ":1");
-                            double[] t =  (double[])tem.copyTo1DJavaArray();
-                            double ssta = swarm.get(j * 200 + i, 0);
-                            if(j < 40 || j > 220){
-                                sstaArray.set(index.set(0, k, i, j), t[0]);
-                            } else {
-                                sstaArray.set(index.set(0, k, i, j), t[0] + ssta);
-                            }
+            for(int k = 0; k < 50; k++){
+                for(int i = 0; i < 200; i++){
+                    for(int j = 0; j < 360; j++){
+                        Array tem = varBean.read("0:0:1, "+ k + ":" + k + ":1, " + i + ":" + i + ":1, " + j + ":" + j + ":1");
+                        if(k < 21 && j >= 40 && j < 220){
+                            double ssta = swarm.get(k * 200 * 180 + (j - 40) * 200 + i, 0);
+                            System.out.println(ssta);
+                            sstaArray.set(index.set(0, k, i, j), tem.getDouble(0) + ssta);
                         } else {
-                            Array tem = varBean.read("0:0:1, " + k + ":" + k + ":1, " + i + ":" + i + ":1, " + j + ":" + j + ":1");
-                            double[] t =  (double[])tem.copyTo1DJavaArray();
-                            sstaArray.set(index.set(0, k, i, j), t[0]);
+                            sstaArray.set(index.set(0, k, i, j), tem.getDouble(0));
                         }
                     }
                 }
@@ -72,42 +65,10 @@ public class FileHelper {
     }
 
 
-    public static double[][] getSigma(){
+    public static double[][][] getSigma(){
 
-        try{
-            NetcdfFileWriteable ncfile = NetcdfFileWriteable.openExisting(Constants.DATA_PATH + "ssta_300Y.nc");
-            Variable sst = ncfile.findVariable("ssta");
-            double[][][] startMonth = new double[300][200][360];
-
-            for(int i = 0; i < 300; i++){
-                Array part = sst.read((i * 12 + Constants.START_MONTH) + ":" + (i * 12 + Constants.START_MONTH) + ":1, 0:199:1, 0:359:1");
-                Index index = part.reduce().getIndex();
-                double[][] tem = new double[200][360];
-                for(int j = 0; j < 200; j++){
-                    for(int k = 0; k < 360; k++){
-                        tem[j][k] = part.reduce().getDouble(index.set(j, k));
-                    }
-                }
-                startMonth[i] = tem;
-            }
-
-            double[][] sigma = new double[200][360];
-            for(int i = 0; i < 200; i++){
-                for(int j = 0; j < 360; j++){
-                    double[] tem = new double[100];
-                    for(int k = 0; k < 100; k++){
-                        tem[k] = startMonth[k][i][j];
-                    }
-                    sigma[i][j] = getStandardDevition(tem);
-                }
-            }
-
-            return sigma;
-
-        } catch (Exception e){
-            e.printStackTrace();
-            return null;
-        }
+        double[][][] sigma = new double[21][200][120];
+        return sigma;
 
     }
 
@@ -329,13 +290,13 @@ public class FileHelper {
         return (double)(sum / array.length);
     }
 
-    public static double getStandardDevition(double[] array){
-        double sum = 0;
+    public static double getStandardDeviation(double[] array){
+        double sum = 0.0;
         double average = getAverage(array);
         for(int i = 0;i < array.length;i++){
-            sum += Math.sqrt(((double)array[i] - average) * (array[i] - average));
+            sum += Math.pow((array[i] - average), 2);
         }
-        return (sum / (array.length - 1));
+        return Math.sqrt(sum / array.length);
     }
 
     public static String getOceanOutputFileName(int order) {

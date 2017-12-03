@@ -45,7 +45,7 @@ public class PPSO {
     private double w = 2;
 
     double[] lat;
-    double[][] sigma;
+    double[][][] sigma;
 
     public PPSO(int swarmCount, int modelCount, Matrix lambdaMatrix){
         this.swarmCount = swarmCount;
@@ -74,11 +74,6 @@ public class PPSO {
             }
             Matrix temp = Matrix.random(PCACOUNT, 1).minus(mod).times(44);
             this.swarmMatrices.add(temp);
-            if(isLegal(i) > Constants.CONTRAINT){
-                this.swarmMatrices.remove(temp);
-                i = i - 1;
-                continue;
-            }
         }
 
         return this.swarmMatrices;
@@ -93,9 +88,13 @@ public class PPSO {
         Matrix p = new Matrix(tem);
         p = lambdaMatrix.times(p);
         double sum = 0.0;
-        for(int j = 0; j < 200; j++){
-            for(int k = 40; k < 221; k++){
-                sum += Math.pow(Math.cos(this.lat[j]) * p.get(k * 200 + j, 0) / this.sigma[j][k], 2);
+        for(int i = 0; i < 21; i++){
+            for(int j = 0; j < 200; j++){
+                for(int k = 0; k < 180; k++){
+                    if(this.sigma[i][j][k] != 0){
+                        sum += Math.pow(Math.cos(this.lat[j]) * p.get(i * 200 * 180 + k * 200 + j, 0) / this.sigma[i][j][k], 2);
+                    }
+                }
             }
         }
         return Math.sqrt(sum);
@@ -165,12 +164,12 @@ public class PPSO {
                 while(true) {
                     try {
                         Thread.sleep(1000 * 60 * 5);
-                        String tem_1 = ShellHelper.exec("/usr/bin/yhqueue");
+                        Boolean tem_1 = ShellHelper.exec("/usr/bin/yhqueue");
                         Thread.sleep(1000 * 60 * 2);
-                        String tem_2 = ShellHelper.exec("/usr/bin/yhqueue");
+                        Boolean tem_2 = ShellHelper.exec("/usr/bin/yhqueue");
                         Thread.sleep(1000 * 60 * 1);
-                        String tem_3 = ShellHelper.exec("/usr/bin/yhqueue");
-                        if (!tem_1.contains("fr21.csh") && !tem_2.contains("fr21.csh") && !tem_3.contains("fr21.csh")) {
+                        Boolean tem_3 = ShellHelper.exec("/usr/bin/yhqueue");
+                        if (tem_1 && tem_2 && tem_3) {
                             System.out.println("step " + i + "group" + p + " finish! ");
                             break;
                         } else {
@@ -214,7 +213,7 @@ public class PPSO {
 
             index = getMaxIndex(this.swarmPBestValue);
             //更新粒子群体最优矩阵和值
-            if(this.swarmGBestValue > this.swarmPBestValue[index]){
+            if(this.swarmGBestValue < this.swarmPBestValue[index]){
                 this.swarmGBestValue = this.swarmPBestValue[index];
                 this.swarmGBest = this.swarmPBest.get(index);
             }
