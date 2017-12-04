@@ -4,17 +4,13 @@ import Jama.Matrix;
 import com.tongji.bruno.gfdl.Constants;
 import com.tongji.bruno.gfdl.ppso.tool.FileHelper;
 import com.tongji.bruno.gfdl.ppso.tool.ShellHelper;
-import com.tongji.bruno.gfdl.ppso.tool.ThreadHelper;
+import com.tongji.bruno.gfdl.ppso.tool.ShellThreadHelper;
 import ucar.ma2.Array;
 import ucar.ma2.Index;
 import ucar.nc2.NetcdfFile;
 import ucar.nc2.Variable;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.security.spec.ECField;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +22,7 @@ public class PPSO {
     private static final int PCACOUNT = Constants.PCA_COUNT;
     private static final int STEP = Constants.STEP;
 
-    private List<ThreadHelper> threadHelpers;
+    private List<ShellThreadHelper> shellThreadHelpers;
 
     private Matrix lambdaMatrix; //主成分
 
@@ -72,7 +68,7 @@ public class PPSO {
             for(int j = 0; j < PCACOUNT; j++){
                 mod.set(j, 0, 0.5);
             }
-            Matrix temp = Matrix.random(PCACOUNT, 1).minus(mod).times(44);
+            Matrix temp = Matrix.random(PCACOUNT, 1).minus(mod).times(110);
             this.swarmMatrices.add(temp);
         }
 
@@ -109,7 +105,7 @@ public class PPSO {
             for(int j = 0; j < PCACOUNT; j++){
                 mod.set(j, 0, 0.5);
             }
-            Matrix temp = Matrix.random(PCACOUNT, 1).minus(mod).times(8.0);
+            Matrix temp = Matrix.random(PCACOUNT, 1).minus(mod).times(4.0);
             this.swarmV.add(temp);
         }
 
@@ -138,7 +134,7 @@ public class PPSO {
 
                 int id = p * this.modelCount;
 
-                this.threadHelpers = new ArrayList<ThreadHelper>();
+                this.shellThreadHelpers = new ArrayList<ShellThreadHelper>();
 
                 //准备文件
                 for(int j = 0; j < this.modelCount; j++){
@@ -146,19 +142,17 @@ public class PPSO {
                     if(sum > Constants.CONTRAINT){
                         this.swarmMatrices.set(id + j, this.swarmMatrices.get(id + j).times(Constants.CONTRAINT / sum));
                     }
-                    FileHelper.prepareFile(j, this.lambdaMatrix.times(this.swarmMatrices.get(id + j)));
-                    FileHelper.copyFile(Constants.RESOURCE_PATH + j + "/ocean_temp_salt_" + j + ".nc", Constants.ROOT_PATH + j + "/CM2.1p1/INPUT/ocean_temp_salt.res.nc", true);
-                    ThreadHelper threadHelper = new ThreadHelper(j + "");
-                    this.threadHelpers.add(threadHelper);
+                    ShellThreadHelper shellThreadHelper = new ShellThreadHelper(j, this.lambdaMatrix.times(this.swarmMatrices.get(id + j)));
+                    this.shellThreadHelpers.add(shellThreadHelper);
                 }
 
                 //并行运行
                 for(int j = 0; j < this.modelCount; j++){
-                    this.threadHelpers.get(j).start();
+                    this.shellThreadHelpers.get(j).start();
                     System.out.println("step " + i + " swarm " + (id + j) + " is running! good luck!!!");
                 }
 
-                this.threadHelpers.clear();
+                this.shellThreadHelpers.clear();
 
                 //判断完成
                 while(true) {
@@ -244,9 +238,10 @@ public class PPSO {
                     for(int k = 40; k < 200; k++){
                         adapt += Math.pow(part.reduce().getDouble(index.set(j, k)) - outputMatrix.get(j, k), 2);
                 }
+                ncfile.close();
             }
 
-                return adapt;
+            return adapt;
 
             } catch (Exception e){
                 e.printStackTrace();

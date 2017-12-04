@@ -17,7 +17,7 @@ import java.util.List;
 public class PCA {
 
     private static final int YEAR = Constants.YEAR;
-    private static final String filename = Constants.RESOURCE_PATH + "u.txt";
+    private static final String filename = Constants.DATA_PATH + "u.txt";
 
     private SingularValueDecomposition leftU;
 
@@ -67,9 +67,6 @@ public class PCA {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        System.out.println(pca.length);
-        System.out.println(pca[0].length);
 
         return pca;
 

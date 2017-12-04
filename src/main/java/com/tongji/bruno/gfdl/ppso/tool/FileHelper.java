@@ -2,10 +2,12 @@ package com.tongji.bruno.gfdl.ppso.tool;
 
 import Jama.Matrix;
 import com.tongji.bruno.gfdl.Constants;
+import com.tongji.bruno.gfdl.pca.tool.CalculateHelper;
 import ucar.ma2.Array;
 import ucar.ma2.ArrayDouble;
 import ucar.ma2.Index;
 import ucar.nc2.*;
+import ucar.nc2.dataset.NetcdfDataset;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -18,6 +20,7 @@ public class FileHelper {
 
     private static final String fileName = Constants.DATA_PATH + "ocean_temp_salt.res.nc";
     private static final String RESTART_FILENAME = Constants.DATA_PATH + "sst_clim.nc";
+    private static final String STD_FILENAME = Constants.DATA_PATH + "std.nc";
     private static final String PARAMETER = "temp";
 
     /**
@@ -46,7 +49,6 @@ public class FileHelper {
                         Array tem = varBean.read("0:0:1, "+ k + ":" + k + ":1, " + i + ":" + i + ":1, " + j + ":" + j + ":1");
                         if(k < 21 && j >= 40 && j < 220){
                             double ssta = swarm.get(k * 200 * 180 + (j - 40) * 200 + i, 0);
-                            System.out.println(ssta);
                             sstaArray.set(index.set(0, k, i, j), tem.getDouble(0) + ssta);
                         } else {
                             sstaArray.set(index.set(0, k, i, j), tem.getDouble(0));
@@ -66,8 +68,19 @@ public class FileHelper {
 
 
     public static double[][][] getSigma(){
-
         double[][][] sigma = new double[21][200][120];
+        try {
+            NetcdfFile ncfile = NetcdfDataset.open(STD_FILENAME);
+
+            Variable sst = ncfile.findVariable("std");
+            Array part = sst.read("0:20:1, 0:199:1, 0:179:1");
+            sigma = CalculateHelper.toNormalArray(part);
+
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+
         return sigma;
 
     }
