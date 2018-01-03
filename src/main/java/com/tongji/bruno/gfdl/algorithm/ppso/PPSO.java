@@ -139,8 +139,8 @@ public class PPSO {
                 //准备文件
                 for(int j = 0; j < this.modelCount; j++){
                     double sum = isLegal(id + j);
-                    if(sum > Constants.CONTRAINT){
-                        this.swarmMatrices.set(id + j, this.swarmMatrices.get(id + j).times(Constants.CONTRAINT / sum));
+                    if(sum > Constants.CONSTRAINT){
+                        this.swarmMatrices.set(id + j, this.swarmMatrices.get(id + j).times(Constants.CONSTRAINT / sum));
                     }
                     ShellThreadHelper shellThreadHelper = new ShellThreadHelper(j, this.lambdaMatrix.times(this.swarmMatrices.get(id + j)));
                     this.shellThreadHelpers.add(shellThreadHelper);
