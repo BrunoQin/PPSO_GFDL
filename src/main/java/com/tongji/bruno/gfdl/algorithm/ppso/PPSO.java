@@ -1,5 +1,6 @@
 package com.tongji.bruno.gfdl.algorithm.ppso;
 
+import Jama.EigenvalueDecomposition;
 import Jama.Matrix;
 import com.tongji.bruno.gfdl.Constants;
 import com.tongji.bruno.gfdl.ppso.tool.FileHelper;
@@ -24,12 +25,17 @@ public class PPSO {
 
     private List<ShellThreadHelper> shellThreadHelpers;
 
-    private Matrix lambdaMatrix; //主成分
+    private Matrix samples; //样本
+    private Matrix lambdaMatrix;
+    private Matrix c;
+    private Matrix d;
+    private Matrix v;
 
     private Matrix outputMatrix; //平均态
 
     private int swarmCount; //粒子数量
     private int modelCount; //模式数量
+    private List<Matrix> top5;
     private List<Matrix> swarmMatrices; //粒子群当前位置
     private List<Matrix> swarmPBest; //粒子个体极值位置
     private double[] swarmPBestValue; //粒子群个体极值
@@ -43,14 +49,40 @@ public class PPSO {
     double[] lat;
     double[][][] sigma;
 
-    public PPSO(int swarmCount, int modelCount, Matrix lambdaMatrix){
+    public PPSO(int swarmCount, int modelCount, Matrix samples){
         this.swarmCount = swarmCount;
         this.modelCount = modelCount;
-        this.lambdaMatrix = lambdaMatrix;
+        this.samples = samples;
         this.outputMatrix = FileHelper.readRestartFile();
 
         this.lat = FileHelper.getLat();
         this.sigma = FileHelper.getSigma();
+
+        initLambda(this.samples);
+    }
+
+    public void initLambda(Matrix samples){
+        Matrix _c = samples.transpose().times(samples);
+        EigenvalueDecomposition _c_c = _c.eig();
+        Matrix _c_v = _c_c.getV();
+        Matrix _c_d = _c_c.getD();
+        this.c = _c;
+        this.d = _c_d;
+        this.v = _c_v;
+        this.lambdaMatrix = getLambdaMatrix(this.v);
+    }
+
+    public Matrix getLambdaMatrix(Matrix v){
+        Matrix tv = samples.times(v);
+        int m = tv.getRowDimension();
+        int n = tv.getColumnDimension();
+        for(int i = 0; i < n; i++){
+            double s = Math.sqrt(v.get(i, i));
+            for(int j = 0; j < m; j++){
+                tv.set(j, i, tv.get(j, i) / s);
+            }
+        }
+        return tv;
     }
 
     /**
@@ -212,6 +244,45 @@ public class PPSO {
                 this.swarmGBest = this.swarmPBest.get(index);
             }
 
+            //寻找替换目标
+            this.top5 = new ArrayList<>();
+            this.top5.add(this.swarmMatrices.get(index));
+            double[] temPbest = this.swarmPBestValue;
+            for(int m = 0; m < 4; m++){
+                temPbest[index] = 0;
+                index = getMaxIndex(temPbest);
+                this.top5.add(this.swarmMatrices.get(index));
+            }
+
+            //替换
+            for(int m = 0; m < 5; m++){
+                Matrix s = this.lambdaMatrix.times(this.top5.get(m));
+                double sum = 0.0;
+                int count = 0;
+                for(int n = 0; n < s.getRowDimension(); n++){
+                    if(s.get(n, 0) != 0){
+                        sum += s.get(n, 0);
+                        count++;
+                    }
+                }
+                double ave = sum / count;
+                for(int n = 0; n < s.getRowDimension(); n++){
+                    if(s.get(n, 0) != 0){
+                        this.samples.set(n, i * 5 + m, s.get(n, 0) - ave);
+                    }
+                }
+            }
+
+            //计算特征空间，特征向量
+            Matrix nc = this.samples.transpose().times(this.samples);
+            Matrix dc = nc.minus(this.c);
+            Matrix u = this.d.plus(this.v.transpose().times(dc).times(this.v));
+            u = getDia(u);
+            this.v = nc.minus(u).inverse().times(this.v);
+            this.d = this.d.plus(this.v.transpose().times(dc).times(this.v));
+            this.lambdaMatrix = getLambdaMatrix(this.v);
+            this.c = nc;
+
             //寻步
             for(int j = 0; j < this.swarmCount; j++){
                 advanceStep(j);
@@ -273,6 +344,18 @@ public class PPSO {
             }
         }
         return maxIndex;
+    }
+
+    public Matrix getDia(Matrix u){
+        Matrix tem = new Matrix(300, 300);
+        for(int i = 0; i < tem.getRowDimension(); i++){
+            for(int j = 0; j < tem.getColumnDimension(); j++){
+                tem.set(i, j, u.get(i, j));
+            }
+        }
+
+        return tem;
+
     }
 
 }

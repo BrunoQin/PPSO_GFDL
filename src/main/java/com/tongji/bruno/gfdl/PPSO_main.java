@@ -18,11 +18,9 @@ public class PPSO_main {
         //===================主体======================
         PCA pca = new PCA();
 
-        Matrix lambdaMatrix = new Matrix(pca.getPCA());
-        lambdaMatrix = lambdaMatrix.transpose();
-        System.out.println("pca finish!");
+        Matrix samples = pca.getSamples();
 
-        PPSO ppso = new PPSO(60, 10, lambdaMatrix);
+        PPSO ppso = new PPSO(60, 10, samples);
         List<Matrix> swarmMatrices = ppso.initSwarm();
         List<Matrix> swarmV = ppso.initV();
         Matrix gbest = ppso.seek();
