@@ -96,25 +96,19 @@ public class PPSO {
             FileHelper.createDir(Constants.RESOURCE_PATH + i);
         }
         for(int i = 0; i < this.swarmCount; i++){
-            Matrix mod = new Matrix(PCACOUNT, 1);
-            for(int j = 0; j < PCACOUNT; j++){
+            Matrix mod = new Matrix(300, 1);
+            for(int j = 0; j < 300; j++){
                 mod.set(j, 0, 0.5);
             }
-            Matrix temp = Matrix.random(PCACOUNT, 1).minus(mod).times(110);
+            Matrix temp = Matrix.random(300, 1).minus(mod).times(0.03);
             this.swarmMatrices.add(temp);
         }
-
         return this.swarmMatrices;
 
     }
 
     public double isLegal(int num){
-        double[][] tem = new double[PCACOUNT][1];
-        for(int j = 0; j < PCACOUNT; j++){
-            tem[j][0] = this.swarmMatrices.get(num).get(j, 0);
-        }
-        Matrix p = new Matrix(tem);
-        p = lambdaMatrix.times(p);
+        Matrix p = lambdaMatrix.times(this.swarmMatrices.get(num));
         double sum = 0.0;
         for(int i = 0; i < 21; i++){
             for(int j = 0; j < 200; j++){
@@ -126,18 +120,17 @@ public class PPSO {
             }
         }
         return Math.sqrt(sum);
-
     }
 
     public List<Matrix> initV(){
 
         this.swarmV = new ArrayList<Matrix>();
         for(int i = 0; i < this.swarmCount; i++){
-            Matrix mod = new Matrix(PCACOUNT, 1);
-            for(int j = 0; j < PCACOUNT; j++){
+            Matrix mod = new Matrix(300, 1);
+            for(int j = 0; j < 300; j++){
                 mod.set(j, 0, 0.5);
             }
-            Matrix temp = Matrix.random(PCACOUNT, 1).minus(mod).times(4.0);
+            Matrix temp = Matrix.random(300, 1).minus(mod).times(0.001);
             this.swarmV.add(temp);
         }
 
