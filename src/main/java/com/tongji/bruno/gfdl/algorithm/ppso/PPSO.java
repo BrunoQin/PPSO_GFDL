@@ -77,7 +77,7 @@ public class PPSO {
         int m = tv.getRowDimension();
         int n = tv.getColumnDimension();
         for(int i = 0; i < n; i++){
-            double s = Math.sqrt(v.get(i, i));
+            double s = Math.sqrt(this.d.get(i, i));
             for(int j = 0; j < m; j++){
                 tv.set(j, i, tv.get(j, i) / s);
             }
@@ -279,9 +279,14 @@ public class PPSO {
             Matrix u = this.d.plus(this.v.transpose().times(dc).times(this.v));
             u = getDia(u);
             this.v = nc.minus(u).inverse().times(this.v);
-            this.d = this.d.plus(this.v.transpose().times(dc).times(this.v));
+            this.d = getDia(this.d.plus(this.v.transpose().times(dc).times(this.v)));
             this.lambdaMatrix = getLambdaMatrix(this.v);
             this.c = nc;
+
+            //更新权重
+            updateW(i);
+            updateC1(i);
+            updateC2(i);
 
             //寻步
             for(int j = 0; j < this.swarmCount; j++){
@@ -356,6 +361,18 @@ public class PPSO {
 
         return tem;
 
+    }
+
+    public void updateW(int n){
+        this.w = 1 - (1 / STEP) * n;
+    }
+
+    public void updateC1(int n){
+        this.c1 = 0.8 * Math.pow(Math.sin((Math.PI / 2) * (1 - n / STEP)), 2);
+    }
+
+    public void updateC2(int n){
+        this.c2 = 0.8 * Math.pow(Math.sin((Math.PI * n) / (2 * STEP)), 2);
     }
 
 }
