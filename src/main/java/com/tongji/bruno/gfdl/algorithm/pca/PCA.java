@@ -1,14 +1,10 @@
 package com.tongji.bruno.gfdl.algorithm.pca;
 
 import Jama.Matrix;
-import Jama.SingularValueDecomposition;
 import com.tongji.bruno.gfdl.Constants;
 import com.tongji.bruno.gfdl.pca.tool.CalculateHelper;
 import com.tongji.bruno.gfdl.pca.tool.FileHelper;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,7 +46,7 @@ public class PCA {
         return samples;
     }
 
-    //    public double[][] getPCA(){
+//    public double[][] getPCA(){
 //        File file = new File(filename);  //存放数组数据的文件
 //        BufferedReader in = null;
 //        try {

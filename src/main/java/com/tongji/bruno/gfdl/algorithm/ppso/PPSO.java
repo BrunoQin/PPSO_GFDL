@@ -84,6 +84,7 @@ public class PPSO {
         }
         return tv;
     }
+    //不应该用转换过的特征空间进行矩阵摄扰,应该使用原特征空间****
 
     /**
      * 初始化生成一系列初始低维粒子矩阵
@@ -267,14 +268,23 @@ public class PPSO {
             }
 
             //计算特征空间，特征向量
+//            Matrix nc = this.samples.transpose().times(this.samples);
+//            Matrix dc = nc.minus(this.c);
+//            Matrix u = this.d.plus(this.v.transpose().times(dc).times(this.v));
+//            u = getDia(u);
+//            this.v = nc.minus(u).inverse().times(this.v);
+//            this.d = getDia(this.d.plus(this.v.transpose().times(dc).times(this.v)));
+//            this.lambdaMatrix = getLambdaMatrix(this.v);
+//            this.c = nc;
+
             Matrix nc = this.samples.transpose().times(this.samples);
-            Matrix dc = nc.minus(this.c);
-            Matrix u = this.d.plus(this.v.transpose().times(dc).times(this.v));
-            u = getDia(u);
-            this.v = nc.minus(u).inverse().times(this.v);
-            this.d = getDia(this.d.plus(this.v.transpose().times(dc).times(this.v)));
-            this.lambdaMatrix = getLambdaMatrix(this.v);
+            EigenvalueDecomposition _c_c = nc.eig();
             this.c = nc;
+            this.v = _c_c.getV();
+            this.d = _c_c.getD();
+            this.lambdaMatrix = getLambdaMatrix(this.v);
+            //不通过矩阵摄扰而直接求得特征空间
+            //有问题,待解决****
 
             //更新权重
             updateW(i);
