@@ -1,7 +1,6 @@
 package com.tongji.bruno.gfdl.pca.tool;
 
 import Jama.Matrix;
-import Jama.SingularValueDecomposition;
 import ucar.ma2.Array;
 import ucar.ma2.Index;
 

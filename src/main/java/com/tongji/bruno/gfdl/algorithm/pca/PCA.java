@@ -26,7 +26,6 @@ public class PCA {
         List<double[][][]> averageList = new ArrayList<double[][][]>();
 
         for(int i = 0; i < YEAR; i++){
-            System.out.print(i + " begin!");
             FileHelper fileHelper =  new FileHelper(i * 12);
             fileHelperList.add(fileHelper);
         }

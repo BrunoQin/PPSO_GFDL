@@ -1,13 +1,10 @@
 package com.tongji.bruno.gfdl.pca.tool;
 
-import com.tongji.bruno.gfdl.Constants;
 import ucar.ma2.Array;
-import ucar.nc2.Dimension;
 import ucar.nc2.NetcdfFile;
 import ucar.nc2.Variable;
 import ucar.nc2.dataset.NetcdfDataset;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -15,8 +12,8 @@ import java.util.List;
  */
 public class FileHelper {
 
-    private static final String fileName = Constants.DATA_PATH + "ta300Y_Lev21.nc";
-//    private static final String fileName = "D:\\ssta_300Y.nc";
+//    private static final String fileName = Constants.DATA_PATH + "ta300Y_Lev21.nc";
+    private static final String fileName = "/Users/macbookpro/Documents/github/PPSO_GFDL/data/ta300Y_Lev21.nc";
     private static final String parameter = "ta";
 
     private int year;

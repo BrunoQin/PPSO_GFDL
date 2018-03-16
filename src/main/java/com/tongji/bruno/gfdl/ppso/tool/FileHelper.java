@@ -6,7 +6,10 @@ import com.tongji.bruno.gfdl.pca.tool.CalculateHelper;
 import ucar.ma2.Array;
 import ucar.ma2.ArrayDouble;
 import ucar.ma2.Index;
-import ucar.nc2.*;
+import ucar.nc2.Dimension;
+import ucar.nc2.NetcdfFile;
+import ucar.nc2.NetcdfFileWriteable;
+import ucar.nc2.Variable;
 import ucar.nc2.dataset.NetcdfDataset;
 
 import java.io.*;
@@ -18,7 +21,8 @@ import java.util.List;
  */
 public class FileHelper {
 
-    private static final String fileName = Constants.DATA_PATH + "ocean_temp_salt.res.nc";
+//    private static final String fileName = Constants.DATA_PATH + "ocean_temp_salt.res.nc";
+    private static final String fileName = "/Users/macbookpro/Documents/github/PPSO_GFDL/data/ocean_temp_salt.res.nc";
     private static final String RESTART_FILENAME = Constants.DATA_PATH + "sst_clim.nc";
     private static final String STD_FILENAME = Constants.DATA_PATH + "std.nc";
     private static final String PARAMETER = "temp";
@@ -32,7 +36,9 @@ public class FileHelper {
     public static String prepareFile(int order, Matrix swarm){
         try{
 
-            String orderFileName = Constants.RESOURCE_PATH + order + "/ocean_temp_salt_" + order + ".nc";
+//            String orderFileName = Constants.RESOURCE_PATH + order + "/ocean_temp_salt_" + order + ".nc";
+            String orderFileName = "/Users/macbookpro/Documents/github/PPSO_GFDL/data" + "/ocean_temp_salt_" + order + ".nc";
+
             copyFile(fileName, orderFileName, true);
             NetcdfFileWriteable ncfile = NetcdfFileWriteable.openExisting(orderFileName);
 
