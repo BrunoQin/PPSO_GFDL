@@ -143,15 +143,21 @@ public class PPSO {
                         this.swarmMatrices.set(id + j, this.swarmMatrices.get(id + j).times(Constants.CONSTRAINT / sum));
                     }
                     System.out.println("prepare" + j);
-                    ShellThreadHelper shellThreadHelper = new ShellThreadHelper(j, this.lambdaMatrix.times(this.swarmMatrices.get(id + j)));
-                    this.shellThreadHelpers.add(shellThreadHelper);
+//                    ShellThreadHelper shellThreadHelper = new ShellThreadHelper(j, this.lambdaMatrix.times(this.swarmMatrices.get(id + j)));
+                    FileHelper.prepareFile(j, this.lambdaMatrix.times(this.swarmMatrices.get(id + j)));
+                    FileHelper.copyFile(Constants.RESOURCE_PATH + j + "/ocean_temp_salt_" + j + ".nc", Constants.ROOT_PATH + j + "/CM2.1p1/INPUT/ocean_temp_salt.res.nc", true);
+                    ShellHelper.callScript("command.csh", " " + j + "", Constants.RESOURCE_PATH);
+                    System.out.println("is running! good luck!!!");
+//                    shellThreadHelper.start();
+//                    shellThreadHelper.run();
+//                    this.shellThreadHelpers.add(shellThreadHelper);
                 }
 
-                //并行运行
-                for(int j = 0; j < this.modelCount; j++){
-                    this.shellThreadHelpers.get(j).start();
-                    System.out.println("step " + i + " swarm " + (id + j) + " is running! good luck!!!");
-                }
+//                //并行运行
+//                for(int j = 0; j < this.modelCount; j++){
+//                    this.shellThreadHelpers.get(j).start();
+//                    System.out.println("step " + i + " swarm " + (id + j) + " is running! good luck!!!");
+//                }
 
                 this.shellThreadHelpers.clear();
 
