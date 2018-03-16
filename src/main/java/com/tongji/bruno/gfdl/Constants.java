@@ -5,7 +5,7 @@ package com.tongji.bruno.gfdl;
  */
 public class Constants {
 
-    public static final String ROOT_PATH = "/HOME/iocas_mmu_2/BIGDATA/PPSO/";
+    public static final String ROOT_PATH = "/BIGDATA1/iocas_mmu_2/PPSO/";
     public static final String RESOURCE_PATH = ROOT_PATH + "record/";
     public static final String DATA_PATH = RESOURCE_PATH + "data/";
     public static final int CONSTRAINT = 450;
