@@ -168,6 +168,7 @@ public class PPSO {
                     if(sum > Constants.CONSTRAINT){
                         this.swarmMatrices.set(id + j, this.swarmMatrices.get(id + j).times(Constants.CONSTRAINT / sum));
                     }
+                    System.out.println("prepare" + j);
                     ShellThreadHelper shellThreadHelper = new ShellThreadHelper(j, this.lambdaMatrix.times(this.swarmMatrices.get(id + j)));
                     this.shellThreadHelpers.add(shellThreadHelper);
                 }
@@ -175,6 +176,7 @@ public class PPSO {
                 //并行运行
                 for(int j = 0; j < this.modelCount; j++){
                     this.shellThreadHelpers.get(j).start();
+                    System.out.println("start" + j);
                     System.out.println("step " + i + " swarm " + (id + j) + " is running! good luck!!!");
                 }
 

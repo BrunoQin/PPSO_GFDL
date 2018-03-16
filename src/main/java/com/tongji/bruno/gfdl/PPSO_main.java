@@ -20,7 +20,7 @@ public class PPSO_main {
 
         Matrix samples = pca.getSamples();
 
-        PPSO ppso = new PPSO(30, 10, samples);
+        PPSO ppso = new PPSO(10, 10, samples);
         List<Matrix> swarmMatrices = ppso.initSwarm();
         List<Matrix> swarmV = ppso.initV();
         Matrix gbest = ppso.seek();
@@ -28,6 +28,9 @@ public class PPSO_main {
         for(int k = 0; k < 300; k++){
             FileHelper.writeFile(Double.toString(gbest.get(k, 0)), Constants.RESOURCE_PATH  + "best.txt");
         }
+//        ShellThreadHelper shellThreadHelper = new ShellThreadHelper(0, null);
+////        shellThreadHelper.add(shellThreadHelper);
+//        shellThreadHelper.start();
         //===================主体======================
 
     }

@@ -15,8 +15,8 @@ public class NCFileTest {
     public static void main(String[] args) {
 
         try{
-            String newFileName = "D:\\ocean_temp_salt_0.nc";
-            String oldFileName = "D:\\ocean_temp_salt.res.nc";
+            String newFileName = "/Users/macbookpro/Desktop/ocean_temp_salt_0.nc";
+            String oldFileName = "/Users/macbookpro/Desktop/ocean_temp_salt.res.nc";
             NetcdfFileWriteable oldNcfile = NetcdfFileWriteable.openExisting(oldFileName);
             NetcdfFileWriteable newNcfile = NetcdfFileWriteable.openExisting(newFileName);
 
