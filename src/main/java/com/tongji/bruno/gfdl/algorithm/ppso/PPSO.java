@@ -146,10 +146,8 @@ public class PPSO {
 //                    ShellThreadHelper shellThreadHelper = new ShellThreadHelper(j, this.lambdaMatrix.times(this.swarmMatrices.get(id + j)));
                     FileHelper.prepareFile(j, this.lambdaMatrix.times(this.swarmMatrices.get(id + j)));
                     FileHelper.copyFile(Constants.RESOURCE_PATH + j + "/ocean_temp_salt_" + j + ".nc", Constants.ROOT_PATH + j + "/CM2.1p1/INPUT/ocean_temp_salt.res.nc", true);
-                    ShellHelper.callScript("command.csh", " " + j + "", Constants.RESOURCE_PATH);
+//                    ShellHelper.callScript("command.csh", " " + j + "", Constants.RESOURCE_PATH);
                     System.out.println("is running! good luck!!!");
-//                    shellThreadHelper.start();
-//                    shellThreadHelper.run();
 //                    this.shellThreadHelpers.add(shellThreadHelper);
                 }
 
@@ -219,6 +217,11 @@ public class PPSO {
                 this.swarmGBest = this.swarmPBest.get(index);
             }
 
+            //更新权重
+            updateW(i);
+            updateC1(i);
+            updateC2(i);
+
             //寻步
             for(int j = 0; j < this.swarmCount; j++){
                 advanceStep(j);
@@ -280,6 +283,18 @@ public class PPSO {
             }
         }
         return maxIndex;
+    }
+
+    public void updateW(int n){
+        this.w = 1 - (1 / STEP) * n;
+    }
+
+    public void updateC1(int n){
+        this.c1 = 0.8 * Math.pow(Math.sin((Math.PI / 2) * (1 - n / STEP)), 2);
+    }
+
+    public void updateC2(int n){
+        this.c2 = 0.8 * Math.pow(Math.sin((Math.PI * n) / (2 * STEP)), 2);
     }
 
 }
