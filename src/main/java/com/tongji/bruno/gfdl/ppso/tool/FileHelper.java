@@ -19,7 +19,8 @@ import java.util.List;
 public class FileHelper {
 
     private static final String fileName = Constants.DATA_PATH + "ocean_temp_salt.res.nc";
-    private static final String RESTART_FILENAME = Constants.DATA_PATH + "sst_clim.nc";
+//    private static final String RESTART_FILENAME = Constants.DATA_PATH + "92.nc";
+    private static final String RESTART_FILENAME = "/Users/macbookpro/Documents/github/PPSO_GFDL/data/92.nc";
     private static final String STD_FILENAME = Constants.DATA_PATH + "std.nc";
     private static final String PARAMETER = "temp";
 
@@ -36,10 +37,10 @@ public class FileHelper {
             copyFile(fileName, orderFileName, true);
             NetcdfFileWriteable ncfile = NetcdfFileWriteable.openExisting(orderFileName);
 
-            Dimension xaxis = ncfile.getDimensions().get(0);
-            Dimension yaxis = ncfile.getDimensions().get(1);
-            Dimension zaxis = ncfile.getDimensions().get(2);
-            Dimension time = ncfile.getDimensions().get(3);
+            Dimension time = ncfile.getDimensions().get(0);
+            Dimension zaxis = ncfile.getDimensions().get(1);
+            Dimension yaxis = ncfile.getDimensions().get(2);
+            Dimension xaxis = ncfile.getDimensions().get(3);
             ArrayDouble sstaArray = new ArrayDouble.D4(time.getLength(), zaxis.getLength(), yaxis.getLength(), xaxis.getLength());
             Index index = sstaArray.getIndex();
             Variable varBean = ncfile.findVariable(PARAMETER);
@@ -47,7 +48,7 @@ public class FileHelper {
                 for(int i = 0; i < 200; i++){
                     for(int j = 0; j < 360; j++){
                         Array tem = varBean.read("0:0:1, "+ k + ":" + k + ":1, " + i + ":" + i + ":1, " + j + ":" + j + ":1");
-                        if(k < 21 && j >= 40 && j < 220){
+                        if(k < 21 && j >= 40 && j < 220 && varBean.read("0:0:1, " + "21:21:1, " + i + ":" + i + ":1, " + j + ":" + j + ":1").getDouble(0) <= 9E36 && varBean.read("0:0:1, " + "21:21:1, " + i + ":" + i + ":1, " + j + ":" + j + ":1").getDouble(0) > -1E20){
                             double ssta = swarm.get(k * 200 * 180 + (j - 40) * 200 + i, 0);
                             sstaArray.set(index.set(0, k, i, j), tem.getDouble(0) + ssta);
                         } else {
@@ -98,26 +99,30 @@ public class FileHelper {
         }
     }
 
-    public static Matrix readRestartFile(){
+    public static List<Matrix> readRestartFile(){
         try{
+            List<Matrix> sst_ave = new ArrayList<>();
             NetcdfFileWriteable ncfile = NetcdfFileWriteable.openExisting(RESTART_FILENAME);
 
-            Variable sst = ncfile.findVariable("sst_ave");
-            Array part = sst.read("0:199:1, 0:359:1");
-            double[][]  temp = new double[200][360];
-            Index index = part.getIndex();
-            for(int i = 0; i < 200; i++){
-                for(int j = 0; j < 360; j++){
-                    //读取第九个月的数据
-                    if(part.getDouble(index.set(i, j)) >= 9E36 ){
-                        temp[i][j] = 0;
-                    } else {
-                        temp[i][j] = part.getDouble(index.set(i, j));
+            for(int p = 0; p < 12; p++){
+                Variable sst = ncfile.findVariable("sst");
+                Array part = sst.read(p + ":" + p + ":1, 0:199:1, 0:359:1");
+                double[][] temp = new double[200][360];
+                Index index = part.reduce().getIndex();
+                for(int i = 0; i < 200; i++){
+                    for(int j = 0; j < 360; j++){
+                        //读取数据
+                        if(part.reduce().getDouble(index.set(i, j)) >= 9E36 || part.reduce().getDouble(index.set(i, j)) <= -1E20){
+                            temp[i][j] = 0;
+                        } else {
+                            temp[i][j] = part.reduce().getDouble(index.set(i, j));
+                        }
                     }
                 }
+                sst_ave.add(new Matrix(temp));
             }
 
-            return new Matrix(temp);
+            return sst_ave;
         } catch (Exception e){
             e.printStackTrace();
             return null;

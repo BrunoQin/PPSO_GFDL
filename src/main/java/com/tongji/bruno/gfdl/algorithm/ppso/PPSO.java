@@ -26,7 +26,7 @@ public class PPSO {
 
     private Matrix lambdaMatrix; //主成分
 
-    private Matrix outputMatrix; //平均态
+    private List<Matrix> outputMatrix; //平均态
 
     private int swarmCount; //粒子数量
     private int modelCount; //模式数量
@@ -146,8 +146,8 @@ public class PPSO {
 //                    ShellThreadHelper shellThreadHelper = new ShellThreadHelper(j, this.lambdaMatrix.times(this.swarmMatrices.get(id + j)));
                     FileHelper.prepareFile(j, this.lambdaMatrix.times(this.swarmMatrices.get(id + j)));
                     FileHelper.copyFile(Constants.RESOURCE_PATH + j + "/ocean_temp_salt_" + j + ".nc", Constants.ROOT_PATH + j + "/CM2.1p1/INPUT/ocean_temp_salt.res.nc", true);
-//                    ShellHelper.callScript("command.csh", " " + j + "", Constants.RESOURCE_PATH);
-                    System.out.println("is running! good luck!!!");
+                    ShellHelper.callScript("command.csh", " " + j + "", Constants.RESOURCE_PATH);
+                    System.out.println("step " + i + " swarm " + (id + j) + " is running! good luck!!!");
 //                    this.shellThreadHelpers.add(shellThreadHelper);
                 }
 
@@ -245,8 +245,13 @@ public class PPSO {
                 Index index = part.reduce().getIndex();
                 double adapt = 0;
                 for(int j = 62; j < 130; j++){
-                    for(int k = 40; k < 200; k++){
-                        adapt += Math.pow(part.reduce().getDouble(index.set(j, k)) - outputMatrix.get(j, k), 2);
+                    for(int k = 79; k < 130; k++){
+                        if(part.reduce().getDouble(index.set(j, k)) >= 9E36 || part.reduce().getDouble(index.set(j, k)) <= -1E20) {
+                            adapt += Math.pow(0 - outputMatrix.get(11).get(j, k), 2);
+                        } else {
+                            adapt += Math.pow(part.reduce().getDouble(index.set(j, k)) - outputMatrix.get(11).get(j, k), 2);
+                        }
+
                 }
                 ncfile.close();
             }

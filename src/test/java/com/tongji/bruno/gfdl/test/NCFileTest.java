@@ -20,10 +20,12 @@ public class NCFileTest {
             NetcdfFileWriteable oldNcfile = NetcdfFileWriteable.openExisting(oldFileName);
             NetcdfFileWriteable newNcfile = NetcdfFileWriteable.openExisting(newFileName);
 
-            Dimension xaxis = newNcfile.getDimensions().get(0);
-            Dimension yaxis = newNcfile.getDimensions().get(1);
-            Dimension zaxis = newNcfile.getDimensions().get(2);
-            Dimension time = newNcfile.getDimensions().get(3);
+            Dimension time = oldNcfile.getDimensions().get(0);
+            Dimension zaxis = oldNcfile.getDimensions().get(1);
+            Dimension yaxis = oldNcfile.getDimensions().get(2);
+            Dimension xaxis = oldNcfile.getDimensions().get(3);
+            System.out.println(time.getName() + "" + xaxis.getName() + "" + yaxis.getName() + "" + zaxis.getName());
+            System.out.println(time.getLength() + "" + xaxis.getLength() + "" + yaxis.getLength() + "" + zaxis.getLength());
 
             ArrayDouble sstaArray = new ArrayDouble.D4(time.getLength(), zaxis.getLength(), yaxis.getLength(), xaxis.getLength());
             Index index = sstaArray.getIndex();
@@ -36,23 +38,12 @@ public class NCFileTest {
                         Array tem_o = varBean_o.read("0:0:1, " + k + ":" + k + ":1, " + i + ":" + i + ":1, " + j + ":" + j + ":1");
                         double tn =  tem_n.getDouble(0);
                         double tm =  tem_o.getDouble(0);
-//                        if(tn >= 9E36){
-//                            tn = 0;
-//                        }
-//                        if(tn <= -1.0000000200408773E20){
-//                            tn = 0;
-//                        }
-//                        if(tm >= 9E36){
-//                            tm = 0;
-//                        }
-//                        if(tm <= -1.0000000200408773E20)
-//                            tm = 0;
                         sstaArray.set(index.set(0, k, i, j), tn - tm);
                     }
                 }
             }
 
-            NetcdfFileWriteable over = NetcdfFileWriteable.openExisting(newFileName, true);
+            NetcdfFileWriteable over = NetcdfFileWriteable.openExisting(oldFileName, true);
             over.write("temp", sstaArray);
 
         } catch (Exception e){
