@@ -19,8 +19,8 @@ import java.util.List;
 public class FileHelper {
 
     private static final String fileName = Constants.DATA_PATH + "ocean_temp_salt.res.nc";
-//    private static final String RESTART_FILENAME = Constants.DATA_PATH + "92.nc";
-    private static final String RESTART_FILENAME = "/Users/macbookpro/Documents/github/PPSO_GFDL/data/92.nc";
+    private static final String RESTART_FILENAME = Constants.DATA_PATH + "92.nc";
+//    private static final String RESTART_FILENAME = "/Users/macbookpro/Documents/github/PPSO_GFDL/data/92.nc";
     private static final String STD_FILENAME = Constants.DATA_PATH + "std.nc";
     private static final String PARAMETER = "temp";
 

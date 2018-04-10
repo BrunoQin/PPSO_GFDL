@@ -15,7 +15,7 @@ public class NCFileTest {
     public static void main(String[] args) {
 
         try{
-            String newFileName = "/Users/macbookpro/Desktop/ocean_temp_salt_0.nc";
+            String newFileName = "/Users/macbookpro/Desktop/2_9_origin.nc";
             String oldFileName = "/Users/macbookpro/Desktop/ocean_temp_salt.res.nc";
             NetcdfFileWriteable oldNcfile = NetcdfFileWriteable.openExisting(oldFileName);
             NetcdfFileWriteable newNcfile = NetcdfFileWriteable.openExisting(newFileName);
@@ -24,8 +24,6 @@ public class NCFileTest {
             Dimension zaxis = oldNcfile.getDimensions().get(1);
             Dimension yaxis = oldNcfile.getDimensions().get(2);
             Dimension xaxis = oldNcfile.getDimensions().get(3);
-            System.out.println(time.getName() + "" + xaxis.getName() + "" + yaxis.getName() + "" + zaxis.getName());
-            System.out.println(time.getLength() + "" + xaxis.getLength() + "" + yaxis.getLength() + "" + zaxis.getLength());
 
             ArrayDouble sstaArray = new ArrayDouble.D4(time.getLength(), zaxis.getLength(), yaxis.getLength(), xaxis.getLength());
             Index index = sstaArray.getIndex();
@@ -43,7 +41,7 @@ public class NCFileTest {
                 }
             }
 
-            NetcdfFileWriteable over = NetcdfFileWriteable.openExisting(oldFileName, true);
+            NetcdfFileWriteable over = NetcdfFileWriteable.openExisting(newFileName, true);
             over.write("temp", sstaArray);
 
         } catch (Exception e){
