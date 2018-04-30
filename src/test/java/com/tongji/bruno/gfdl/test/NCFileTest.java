@@ -3,9 +3,8 @@ package com.tongji.bruno.gfdl.test;
 import ucar.ma2.Array;
 import ucar.ma2.ArrayDouble;
 import ucar.ma2.Index;
-import ucar.nc2.Dimension;
-import ucar.nc2.NetcdfFileWriteable;
-import ucar.nc2.Variable;
+import ucar.nc2.*;
+import ucar.nc2.dataset.NetcdfDataset;
 
 /**
  * Created by 秦博 on 2017/10/24.
@@ -15,15 +14,20 @@ public class NCFileTest {
     public static void main(String[] args) {
 
         try{
-            String newFileName = "/Users/macbookpro/Desktop/2_9_origin.nc";
-            String oldFileName = "/Users/macbookpro/Desktop/ocean_temp_salt.res.nc";
-            NetcdfFileWriteable oldNcfile = NetcdfFileWriteable.openExisting(oldFileName);
-            NetcdfFileWriteable newNcfile = NetcdfFileWriteable.openExisting(newFileName);
+            String newFileName = "/Users/Bruno/Desktop/ocean_temp_salt_0.nc";
+            String oldFileName = "/Users/Bruno/Desktop/ocean_temp_salt.res.nc";
+            NetcdfFile oldNcfile = NetcdfFile.open(oldFileName);
+            NetcdfFile newNcfile = NetcdfFile.open(newFileName);
 
-            Dimension time = oldNcfile.getDimensions().get(0);
-            Dimension zaxis = oldNcfile.getDimensions().get(1);
-            Dimension yaxis = oldNcfile.getDimensions().get(2);
-            Dimension xaxis = oldNcfile.getDimensions().get(3);
+            Dimension xaxis = oldNcfile.getDimensions().get(0);
+            Dimension time = oldNcfile.getDimensions().get(1);
+            Dimension zaxis = oldNcfile.getDimensions().get(2);
+            Dimension yaxis = oldNcfile.getDimensions().get(3);
+
+            System.out.println(xaxis);
+            System.out.println(time);
+            System.out.println(zaxis);
+            System.out.println(yaxis);
 
             ArrayDouble sstaArray = new ArrayDouble.D4(time.getLength(), zaxis.getLength(), yaxis.getLength(), xaxis.getLength());
             Index index = sstaArray.getIndex();
@@ -37,6 +41,9 @@ public class NCFileTest {
                         double tn =  tem_n.getDouble(0);
                         double tm =  tem_o.getDouble(0);
                         sstaArray.set(index.set(0, k, i, j), tn - tm);
+                        if(tn - tm != 0){
+                            System.out.println(tn - tm);
+                        }
                     }
                 }
             }

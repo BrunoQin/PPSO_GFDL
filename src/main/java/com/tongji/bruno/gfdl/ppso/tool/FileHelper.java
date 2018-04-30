@@ -19,8 +19,7 @@ import java.util.List;
 public class FileHelper {
 
     private static final String fileName = Constants.DATA_PATH + "ocean_temp_salt.res.nc";
-    private static final String RESTART_FILENAME = Constants.DATA_PATH + "92.nc";
-//    private static final String RESTART_FILENAME = "/Users/macbookpro/Documents/github/PPSO_GFDL/data/92.nc";
+    private static final String RESTART_FILENAME = Constants.DATA_PATH + "63.nc";
     private static final String STD_FILENAME = Constants.DATA_PATH + "std.nc";
     private static final String PARAMETER = "temp";
 
@@ -35,12 +34,12 @@ public class FileHelper {
 
             String orderFileName = Constants.RESOURCE_PATH + order + "/ocean_temp_salt_" + order + ".nc";
             copyFile(fileName, orderFileName, true);
-            NetcdfFileWriteable ncfile = NetcdfFileWriteable.openExisting(orderFileName);
+            NetcdfFile ncfile = NetcdfFile.open(orderFileName);
 
-            Dimension time = ncfile.getDimensions().get(0);
-            Dimension zaxis = ncfile.getDimensions().get(1);
-            Dimension yaxis = ncfile.getDimensions().get(2);
-            Dimension xaxis = ncfile.getDimensions().get(3);
+            Dimension xaxis = ncfile.getDimensions().get(0);
+            Dimension time = ncfile.getDimensions().get(1);
+            Dimension zaxis = ncfile.getDimensions().get(2);
+            Dimension yaxis = ncfile.getDimensions().get(3);
             ArrayDouble sstaArray = new ArrayDouble.D4(time.getLength(), zaxis.getLength(), yaxis.getLength(), xaxis.getLength());
             Index index = sstaArray.getIndex();
             Variable varBean = ncfile.findVariable(PARAMETER);
@@ -48,7 +47,7 @@ public class FileHelper {
                 for(int i = 0; i < 200; i++){
                     for(int j = 0; j < 360; j++){
                         Array tem = varBean.read("0:0:1, "+ k + ":" + k + ":1, " + i + ":" + i + ":1, " + j + ":" + j + ":1");
-                        if(k < 21 && j >= 40 && j < 220 && varBean.read("0:0:1, " + "21:21:1, " + i + ":" + i + ":1, " + j + ":" + j + ":1").getDouble(0) <= 9E36 && varBean.read("0:0:1, " + "21:21:1, " + i + ":" + i + ":1, " + j + ":" + j + ":1").getDouble(0) > -1E20){
+                        if(k < 11 && i >= 20 && i < 170 && j >= 40 && j < 200 && varBean.read("0:0:1, " + "11:11:1, " + i + ":" + i + ":1, " + j + ":" + j + ":1").getDouble(0) <= 9E36 && varBean.read("0:0:1, " + "21:21:1, " + i + ":" + i + ":1, " + j + ":" + j + ":1").getDouble(0) > -1E20){
                             double ssta = swarm.get(k * 200 * 180 + (j - 40) * 200 + i, 0);
                             sstaArray.set(index.set(0, k, i, j), tem.getDouble(0) + ssta);
                         } else {
@@ -58,7 +57,9 @@ public class FileHelper {
                 }
             }
 
-            ncfile.write(PARAMETER, sstaArray);
+
+            NetcdfFileWriteable over = NetcdfFileWriteable.openExisting(orderFileName, true);
+            over.write("temp", sstaArray);
 
             return orderFileName;
         } catch (Exception e){
@@ -74,7 +75,7 @@ public class FileHelper {
             NetcdfFile ncfile = NetcdfDataset.open(STD_FILENAME);
 
             Variable sst = ncfile.findVariable("std");
-            Array part = sst.read("0:20:1, 0:199:1, 0:179:1");
+            Array part = sst.read("0:10:1, 0:149:1, 0:159:1");
             sigma = CalculateHelper.toNormalArray(part);
 
         } catch (Exception e){

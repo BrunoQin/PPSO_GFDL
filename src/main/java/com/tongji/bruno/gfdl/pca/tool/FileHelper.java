@@ -16,7 +16,6 @@ import java.util.List;
 public class FileHelper {
 
     private static final String fileName = Constants.DATA_PATH + "ta300Y_Lev21.nc";
-//    private static final String fileName = "D:\\ssta_300Y.nc";
     private static final String parameter = "ta";
 
     private int year;
@@ -30,7 +29,7 @@ public class FileHelper {
             NetcdfFile ncfile = NetcdfDataset.open(fileName);
 
             Variable sst = ncfile.findVariable(parameter);
-            Array part = sst.read(n + ":" + n + ":1, 0:20:1, 0:199:1, 0:179:1");
+            Array part = sst.read(n + ":" + n + ":1, 0:11:1, 20:170:1, 0:179:1");
             this.singleMonthArray = part;
 
         } catch (Exception e){

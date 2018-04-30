@@ -87,8 +87,9 @@ public class PPSO {
         for(int i = 0; i < 21; i++){
             for(int j = 0; j < 200; j++){
                 for(int k = 0; k < 180; k++){
-                    if(this.sigma[i][j][k] != 0){
-                        sum += Math.pow(Math.cos(this.lat[j]) * p.get(i * 200 * 180 + k * 200 + j, 0) / this.sigma[i][j][k], 2);
+                    if(i < 11 && j >= 20 && j < 170 && k < 160){
+                        if(this.sigma[i][j-20][k] != 0)
+                        sum += Math.pow(Math.cos(this.lat[j]) * p.get(i * 200 * 180 + k * 200 + j, 0) / this.sigma[i][j-20][k], 2);
                     }
                 }
             }
@@ -105,7 +106,7 @@ public class PPSO {
             for(int j = 0; j < PCACOUNT; j++){
                 mod.set(j, 0, 0.5);
             }
-            Matrix temp = Matrix.random(PCACOUNT, 1).minus(mod).times(4.0);
+            Matrix temp = Matrix.random(PCACOUNT, 1).minus(mod).times(2.0);
             this.swarmV.add(temp);
         }
 
@@ -291,15 +292,15 @@ public class PPSO {
     }
 
     public void updateW(int n){
-        this.w = 1 - (1 / STEP) * n;
+        this.w = 0.5 - (1 / STEP) * n;
     }
 
     public void updateC1(int n){
-        this.c1 = 0.8 * Math.pow(Math.sin((Math.PI / 2) * (1 - n / STEP)), 2);
+        this.c1 = 0.1 * Math.pow(Math.sin((Math.PI / 2) * (1 - n / STEP)), 2);
     }
 
     public void updateC2(int n){
-        this.c2 = 0.8 * Math.pow(Math.sin((Math.PI * n) / (2 * STEP)), 2);
+        this.c2 = 0.1 * Math.pow(Math.sin((Math.PI * n) / (2 * STEP)), 2);
     }
 
 }
