@@ -1,10 +1,7 @@
 package com.tongji.bruno.gfdl.test;
 
-import ucar.ma2.Array;
-import ucar.ma2.ArrayDouble;
-import ucar.ma2.Index;
+import ucar.ma2.*;
 import ucar.nc2.*;
-import ucar.nc2.dataset.NetcdfDataset;
 
 /**
  * Created by 秦博 on 2017/10/24.
@@ -17,12 +14,12 @@ public class NCFileTest {
             String newFileName = "/Users/Bruno/Desktop/ocean_temp_salt_0.nc";
             String oldFileName = "/Users/Bruno/Desktop/ocean_temp_salt.res.nc";
             NetcdfFile oldNcfile = NetcdfFile.open(oldFileName);
-            NetcdfFile newNcfile = NetcdfFile.open(newFileName);
+            NetcdfFileWriter newNcfile = NetcdfFileWriter.openExisting(newFileName);
 
-            Dimension xaxis = oldNcfile.getDimensions().get(0);
-            Dimension time = oldNcfile.getDimensions().get(1);
-            Dimension zaxis = oldNcfile.getDimensions().get(2);
-            Dimension yaxis = oldNcfile.getDimensions().get(3);
+            Dimension xaxis = newNcfile.getNetcdfFile().getDimensions().get(0);
+            Dimension yaxis = newNcfile.getNetcdfFile().getDimensions().get(1);
+            Dimension zaxis = newNcfile.getNetcdfFile().getDimensions().get(2);
+            Dimension time = newNcfile.getNetcdfFile().getDimensions().get(3);
 
             System.out.println(xaxis);
             System.out.println(time);
@@ -30,9 +27,11 @@ public class NCFileTest {
             System.out.println(yaxis);
 
             ArrayDouble sstaArray = new ArrayDouble.D4(time.getLength(), zaxis.getLength(), yaxis.getLength(), xaxis.getLength());
+
             Index index = sstaArray.getIndex();
             Variable varBean_o = oldNcfile.findVariable("temp");
             Variable varBean_n = newNcfile.findVariable("temp");
+
             for(int i = 0; i < 200; i++){
                 for(int j = 0; j < 360; j++){
                     for(int k = 0; k < 50; k++){
@@ -41,19 +40,16 @@ public class NCFileTest {
                         double tn =  tem_n.getDouble(0);
                         double tm =  tem_o.getDouble(0);
                         sstaArray.set(index.set(0, k, i, j), tn - tm);
-                        if(tn - tm != 0){
-                            System.out.println(tn - tm);
-                        }
                     }
                 }
             }
 
-            NetcdfFileWriteable over = NetcdfFileWriteable.openExisting(newFileName, true);
-            over.write("temp", sstaArray);
+            newNcfile.write(varBean_n, sstaArray);
 
         } catch (Exception e){
             e.printStackTrace();
         }
+
     }
 
 }

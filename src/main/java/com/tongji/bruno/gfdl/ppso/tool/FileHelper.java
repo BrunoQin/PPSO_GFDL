@@ -34,20 +34,20 @@ public class FileHelper {
 
             String orderFileName = Constants.RESOURCE_PATH + order + "/ocean_temp_salt_" + order + ".nc";
             copyFile(fileName, orderFileName, true);
-            NetcdfFile ncfile = NetcdfFile.open(orderFileName);
+            NetcdfFile oldNcfile = NetcdfFile.open(fileName);
 
-            Dimension xaxis = ncfile.getDimensions().get(0);
-            Dimension time = ncfile.getDimensions().get(1);
-            Dimension zaxis = ncfile.getDimensions().get(2);
-            Dimension yaxis = ncfile.getDimensions().get(3);
+            Dimension xaxis = oldNcfile.getDimensions().get(0);
+            Dimension time = oldNcfile.getDimensions().get(1);
+            Dimension zaxis = oldNcfile.getDimensions().get(2);
+            Dimension yaxis = oldNcfile.getDimensions().get(3);
             ArrayDouble sstaArray = new ArrayDouble.D4(time.getLength(), zaxis.getLength(), yaxis.getLength(), xaxis.getLength());
             Index index = sstaArray.getIndex();
-            Variable varBean = ncfile.findVariable(PARAMETER);
+            Variable varBean_o = oldNcfile.findVariable(PARAMETER);
             for(int k = 0; k < 50; k++){
                 for(int i = 0; i < 200; i++){
                     for(int j = 0; j < 360; j++){
-                        Array tem = varBean.read("0:0:1, "+ k + ":" + k + ":1, " + i + ":" + i + ":1, " + j + ":" + j + ":1");
-                        if(k < 11 && i >= 20 && i < 170 && j >= 40 && j < 200 && varBean.read("0:0:1, " + "11:11:1, " + i + ":" + i + ":1, " + j + ":" + j + ":1").getDouble(0) <= 9E36 && varBean.read("0:0:1, " + "21:21:1, " + i + ":" + i + ":1, " + j + ":" + j + ":1").getDouble(0) > -1E20){
+                        Array tem = varBean_o.read("0:0:1, "+ k + ":" + k + ":1, " + i + ":" + i + ":1, " + j + ":" + j + ":1");
+                        if(k < 11 && i >= 20 && i < 170 && j >= 40 && j < 200 && varBean_o.read("0:0:1, " + "11:11:1, " + i + ":" + i + ":1, " + j + ":" + j + ":1").getDouble(0) <= 9E36 && varBean_o.read("0:0:1, " + "21:21:1, " + i + ":" + i + ":1, " + j + ":" + j + ":1").getDouble(0) > -1E20){
                             double ssta = swarm.get(k * 200 * 180 + (j - 40) * 200 + i, 0);
                             sstaArray.set(index.set(0, k, i, j), tem.getDouble(0) + ssta);
                         } else {
@@ -56,10 +56,15 @@ public class FileHelper {
                     }
                 }
             }
+            oldNcfile.close();
 
-
-            NetcdfFileWriteable over = NetcdfFileWriteable.openExisting(orderFileName, true);
-            over.write("temp", sstaArray);
+            NetcdfFileWriter ncfile = NetcdfFileWriter.openExisting(orderFileName);
+            Variable varBean = ncfile.findVariable(PARAMETER);
+//            NetcdfFileWriteable over = NetcdfFileWriteable.openExisting(orderFileName, true);
+            System.out.println("start prepare " + orderFileName);
+            ncfile.write(varBean, sstaArray);
+            ncfile.close();
+            System.out.println("finish prepare " + orderFileName);
 
             return orderFileName;
         } catch (Exception e){
@@ -122,7 +127,7 @@ public class FileHelper {
                 }
                 sst_ave.add(new Matrix(temp));
             }
-
+            ncfile.close();
             return sst_ave;
         } catch (Exception e){
             e.printStackTrace();
