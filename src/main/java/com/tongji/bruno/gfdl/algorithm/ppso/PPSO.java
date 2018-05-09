@@ -10,6 +10,8 @@ import ucar.ma2.Index;
 import ucar.nc2.NetcdfFile;
 import ucar.nc2.Variable;
 
+import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -207,6 +209,27 @@ public class PPSO {
                     FileHelper.deleteFile(Constants.ROOT_PATH + j + "/exp/CM2.1p1.output.tar.gz");
                     FileHelper.deleteFile(Constants.ROOT_PATH + j + "/exp/fms.out");
 
+                    File fa[] = new File(Constants.ROOT_PATH + j + "/CM2.1p1/").listFiles(new FileFilter() {
+                        @Override
+                        public boolean accept(File pathname) {
+                            String filename = pathname.getName();
+                            if(filename.contains("INPUT")){
+                                return false;
+                            }else{
+                                return true;
+                            }
+                        }
+                    });
+
+                    for(int w = 0; w < fa.length; w++){
+                        if(fa[w].isDirectory()){
+                            FileHelper.deleteDirectory(fa[w].getAbsolutePath());
+                        }
+                        if(fa[w].isFile()){
+                            FileHelper.deleteFile(fa[w].getAbsolutePath());
+                        }
+                    }
+
                 }
             }
 
@@ -273,8 +296,8 @@ public class PPSO {
     public void advanceStep(int index){
 
         Matrix v = this.swarmV.get(index).times(w)
-                .plus((this.swarmPBest.get(index).minus(this.swarmMatrices.get(index))).times(Math.random() * c1))
-                .plus((this.swarmGBest.minus(this.swarmMatrices.get(index))).times(Math.random() * c2));
+                .plus((this.swarmPBest.get(index).minus(this.swarmMatrices.get(index))).times((Math.random() - 0.5) * c1 / 2))
+                .plus((this.swarmGBest.minus(this.swarmMatrices.get(index))).times((Math.random() - 0.5) * c2 / 2));
         this.swarmV.set(index, v);
         this.swarmMatrices.set(index, this.swarmMatrices.get(index).plus(v));
 
@@ -291,7 +314,7 @@ public class PPSO {
     }
 
     public void updateW(int n){
-        this.w = 0.5 - (1 / STEP) * n;
+        this.w = (0.5 * (STEP - n)) / STEP + 0.4;
     }
 
     public void updateC1(int n){

@@ -11,7 +11,7 @@ public class NCFileTest {
     public static void main(String[] args) {
 
         try{
-            String newFileName = "/Users/Bruno/Desktop/ocean_temp_salt_0.nc";
+            String newFileName = "/Users/Bruno/Desktop/ocean_temp_salt_6.nc";
             String oldFileName = "/Users/Bruno/Desktop/ocean_temp_salt.res.nc";
             NetcdfFile oldNcfile = NetcdfFile.open(oldFileName);
             NetcdfFileWriter newNcfile = NetcdfFileWriter.openExisting(newFileName);
@@ -39,7 +39,11 @@ public class NCFileTest {
                         Array tem_o = varBean_o.read("0:0:1, " + k + ":" + k + ":1, " + i + ":" + i + ":1, " + j + ":" + j + ":1");
                         double tn =  tem_n.getDouble(0);
                         double tm =  tem_o.getDouble(0);
-                        sstaArray.set(index.set(0, k, i, j), tn - tm);
+                        if(tm < -1E20 || tm >= 9E36){
+                            sstaArray.set(index.set(0, k, i, j), tm);
+                        } else {
+                            sstaArray.set(index.set(0, k, i, j), tn - tm);
+                        }
                     }
                 }
             }

@@ -4,13 +4,6 @@ import Jama.Matrix;
 import com.tongji.bruno.gfdl.algorithm.pca.PCA;
 import com.tongji.bruno.gfdl.algorithm.ppso.PPSO;
 import com.tongji.bruno.gfdl.ppso.tool.FileHelper;
-import ucar.ma2.Array;
-import ucar.ma2.ArrayDouble;
-import ucar.ma2.Index;
-import ucar.nc2.Dimension;
-import ucar.nc2.NetcdfFile;
-import ucar.nc2.NetcdfFileWriter;
-import ucar.nc2.Variable;
 
 import java.util.List;
 
@@ -28,7 +21,6 @@ public class PPSO_main {
         Matrix lambdaMatrix = new Matrix(pca.getPCA());
         lambdaMatrix = lambdaMatrix.transpose();
         System.out.println("pca finish!");
-
         PPSO ppso = new PPSO(30, 10, lambdaMatrix);
         List<Matrix> swarmMatrices = ppso.initSwarm();
         List<Matrix> swarmV = ppso.initV();
