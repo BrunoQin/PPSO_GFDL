@@ -24,7 +24,7 @@ public class PPSO {
     private static final int PCACOUNT = Constants.PCA_COUNT;
     private static final int STEP = Constants.STEP;
 
-    private List<ShellThreadHelper> shellThreadHelpers;
+//    private List<ShellThreadHelper> shellThreadHelpers;
 
     private Matrix lambdaMatrix; //主成分
 
@@ -89,9 +89,9 @@ public class PPSO {
         for(int i = 0; i < 21; i++){
             for(int j = 0; j < 200; j++){
                 for(int k = 0; k < 180; k++){
-                    if(i < 11 && j >= 20 && j < 170 && k < 160){
-                        if(this.sigma[i][j-20][k] != 0)
-                        sum += Math.pow(Math.cos(this.lat[j]) * p.get(i * 200 * 180 + k * 200 + j, 0) / this.sigma[i][j-20][k], 2);
+                    if(i < Constants.PER_LEVEL && j >= Constants.PER_MINLAT && j < Constants.PER_MAXLAT && k < Constants.PER_MAXLON - 40 && k > Constants.PER_MINLON - 40){
+                        if(this.sigma[i][j - Constants.PER_MINLAT][k] != 0)
+                        sum += Math.pow(Math.cos(this.lat[j]) * p.get(i * 200 * 180 + k * 200 + j, 0) / this.sigma[i][j - Constants.PER_MINLAT][k], 2);
                     }
                 }
             }
@@ -137,7 +137,7 @@ public class PPSO {
 
                 int id = p * this.modelCount;
 
-                this.shellThreadHelpers = new ArrayList<ShellThreadHelper>();
+//                this.shellThreadHelpers = new ArrayList<ShellThreadHelper>();
 
                 //准备文件
                 for(int j = 0; j < this.modelCount; j++){
@@ -159,7 +159,7 @@ public class PPSO {
 //                    System.out.println("step " + i + " swarm " + (id + j) + " is running! good luck!!!");
 //                }
 
-                this.shellThreadHelpers.clear();
+//                this.shellThreadHelpers.clear();
 
                 //判断完成
                 while(true) {
@@ -264,15 +264,15 @@ public class PPSO {
             //计算（sst-sst'）平方求和 该值即为适应度值
             try{
                 Variable sst = ncfile.findVariable("sst");
-                Array part = sst.read("11:11:1, 0:199:1, 0:359:1");
+                Array part = sst.read(Constants.ADA_MONTH + ":" + Constants.ADA_MONTH + ":1, 0:199:1, 0:359:1");
                 Index index = part.reduce().getIndex();
                 double adapt = 0;
-                for(int j = 62; j < 130; j++){
-                    for(int k = 79; k < 130; k++){
+                for(int j = Constants.ADA_MINLAT; j < Constants.ADA_MAXLAT; j++){
+                    for(int k = Constants.ADA_MINLON; k < Constants.ADA_MAXLON; k++){
                         if(part.reduce().getDouble(index.set(j, k)) >= 9E36 || part.reduce().getDouble(index.set(j, k)) <= -1E20) {
-                            adapt += Math.pow(0 - outputMatrix.get(11).get(j, k), 2);
+                            adapt += Math.pow(0 - outputMatrix.get(Constants.ADA_MONTH).get(j, k), 2);
                         } else {
-                            adapt += Math.pow(part.reduce().getDouble(index.set(j, k)) - outputMatrix.get(11).get(j, k), 2);
+                            adapt += Math.pow(part.reduce().getDouble(index.set(j, k)) - outputMatrix.get(Constants.ADA_MONTH).get(j, k), 2);
                         }
 
                 }

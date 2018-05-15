@@ -47,8 +47,8 @@ public class FileHelper {
                 for(int i = 0; i < 200; i++){
                     for(int j = 0; j < 360; j++){
                         Array tem = varBean_o.read("0:0:1, "+ k + ":" + k + ":1, " + i + ":" + i + ":1, " + j + ":" + j + ":1");
-                        if(k < 11 && i >= 20 && i < 170 && j >= 40 && j < 200 && varBean_o.read("0:0:1, " + "11:11:1, " + i + ":" + i + ":1, " + j + ":" + j + ":1").getDouble(0) <= 9E36 && varBean_o.read("0:0:1, " + "21:21:1, " + i + ":" + i + ":1, " + j + ":" + j + ":1").getDouble(0) > -1E20){
-                            double ssta = swarm.get(k * 200 * 180 + (j - 40) * 200 + i, 0);
+                        if(k < Constants.PER_LEVEL && i >= Constants.PER_MINLAT && i < Constants.PER_MAXLAT && j >= Constants.PER_MINLON && j < Constants.PER_MAXLON && varBean_o.read("0:0:1, " + "11:11:1, " + i + ":" + i + ":1, " + j + ":" + j + ":1").getDouble(0) <= 9E36 && varBean_o.read("0:0:1, " + "11:11:1, " + i + ":" + i + ":1, " + j + ":" + j + ":1").getDouble(0) > -1E20){
+                            double ssta = swarm.get(k * 200 * 180 + (j - Constants.PER_MINLON) * 200 + i, 0);
                             sstaArray.set(index.set(0, k, i, j), tem.getDouble(0) + ssta);
                         } else {
                             sstaArray.set(index.set(0, k, i, j), tem.getDouble(0));
@@ -60,7 +60,7 @@ public class FileHelper {
 
             NetcdfFileWriter ncfile = NetcdfFileWriter.openExisting(orderFileName);
             Variable varBean = ncfile.findVariable(PARAMETER);
-//            NetcdfFileWriteable over = NetcdfFileWriteable.openExisting(orderFileName, true);
+
             System.out.println("start prepare " + orderFileName);
             ncfile.write(varBean, sstaArray);
             ncfile.close();
@@ -94,8 +94,7 @@ public class FileHelper {
 
     public static double[] getLat(){
         try{
-            NetcdfFile ncfile = null;
-            ncfile = NetcdfFile.open(RESTART_FILENAME);
+            NetcdfFile ncfile = NetcdfFile.open(RESTART_FILENAME);
             Variable lat = ncfile.findVariable("yt_ocean");
             double[] tem = (double[]) lat.read().copyToNDJavaArray();
             return tem;
@@ -108,7 +107,7 @@ public class FileHelper {
     public static List<Matrix> readRestartFile(){
         try{
             List<Matrix> sst_ave = new ArrayList<>();
-            NetcdfFileWriteable ncfile = NetcdfFileWriteable.openExisting(RESTART_FILENAME);
+            NetcdfFile ncfile = NetcdfFile.open(RESTART_FILENAME);
 
             for(int p = 0; p < 12; p++){
                 Variable sst = ncfile.findVariable("sst");
