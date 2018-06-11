@@ -18,12 +18,12 @@ public class Constants {
 
     public static final int PER_MINLON = 40;
     public static final int PER_MAXLON = 200;
-    public static final int PER_MINLAT = 20;
-    public static final int PER_MAXLAT = 170;
-    public static final int PER_LEVEL = 11;
+    public static final int PER_MINLAT = 50;
+    public static final int PER_MAXLAT = 140;
+    public static final int PER_LEVEL = 20;
 
-    public static final int ADA_MINLON = 79;
-    public static final int ADA_MAXLON = 130;
+    public static final int ADA_MINLON = 129;
+    public static final int ADA_MAXLON = 189;
     public static final int ADA_MINLAT = 62;
     public static final int ADA_MAXLAT = 130;
     public static final int ADA_MONTH = 11;
