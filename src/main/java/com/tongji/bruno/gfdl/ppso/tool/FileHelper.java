@@ -20,7 +20,7 @@ public class FileHelper {
 
     private static final String fileName = Constants.DATA_PATH + "ocean_temp_salt.res.nc";
     private static final String RESTART_FILENAME = Constants.DATA_PATH + "63.nc";
-    private static final String STD_FILENAME = Constants.DATA_PATH + "std.nc";
+    private static final String STD_FILENAME = Constants.DATA_PATH + "std_EP.nc";
     private static final String PARAMETER = "temp";
 
     /**
@@ -80,7 +80,7 @@ public class FileHelper {
             NetcdfFile ncfile = NetcdfDataset.open(STD_FILENAME);
 
             Variable sst = ncfile.findVariable("std");
-            Array part = sst.read("0:10:1, 0:149:1, 0:159:1");
+            Array part = sst.read("0:" + (Constants.PER_LEVEL - 1) + ":1, 0:" + (Constants.PER_MAXLAT - Constants.PER_MINLAT - 1) + ":1, 0:" + (Constants.PER_MAXLON - Constants.PER_MINLON - 1) + ":1");
             sigma = CalculateHelper.toNormalArray(part);
 
         } catch (Exception e){

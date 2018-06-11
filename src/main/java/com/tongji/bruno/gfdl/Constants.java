@@ -20,7 +20,7 @@ public class Constants {
     public static final int PER_MAXLON = 200;
     public static final int PER_MINLAT = 50;
     public static final int PER_MAXLAT = 140;
-    public static final int PER_LEVEL = 20;
+    public static final int PER_LEVEL = 21;
 
     public static final int ADA_MINLON = 129;
     public static final int ADA_MAXLON = 189;
