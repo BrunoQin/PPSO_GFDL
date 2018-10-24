@@ -21,7 +21,7 @@ public class PPSO_main {
         Matrix lambdaMatrix = new Matrix(pca.getPCA());
         lambdaMatrix = lambdaMatrix.transpose();
         System.out.println("pca finish!");
-        PPSO ppso = new PPSO(30, 10, lambdaMatrix);
+        PPSO ppso = new PPSO(Constants.SWARM_COUNT, Constants.MODEL_COUNT, lambdaMatrix);
         List<Matrix> swarmMatrices = ppso.initSwarm();
         List<Matrix> swarmV = ppso.initV();
         Matrix gbest = ppso.seek();

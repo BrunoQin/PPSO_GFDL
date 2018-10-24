@@ -108,7 +108,7 @@ public class PPSO {
             for(int j = 0; j < PCACOUNT; j++){
                 mod.set(j, 0, 0.5);
             }
-            Matrix temp = Matrix.random(PCACOUNT, 1).minus(mod).times(2.0);
+            Matrix temp = Matrix.random(PCACOUNT, 1).minus(mod).times(110 * Constants.SPEED_RADIO);
             this.swarmV.add(temp);
         }
 
@@ -296,8 +296,8 @@ public class PPSO {
     public void advanceStep(int index){
 
         Matrix v = this.swarmV.get(index).times(w)
-                .plus((this.swarmPBest.get(index).minus(this.swarmMatrices.get(index))).times((Math.random() - 0.5) * c1 / 2))
-                .plus((this.swarmGBest.minus(this.swarmMatrices.get(index))).times((Math.random() - 0.5) * c2 / 2));
+                .plus((this.swarmPBest.get(index).minus(this.swarmMatrices.get(index))).times(Math.random() * c1))
+                .plus((this.swarmGBest.minus(this.swarmMatrices.get(index))).times(Math.random() * c2));
         this.swarmV.set(index, v);
         this.swarmMatrices.set(index, this.swarmMatrices.get(index).plus(v));
 
@@ -318,11 +318,11 @@ public class PPSO {
     }
 
     public void updateC1(int n){
-        this.c1 = 0.1 * Math.pow(Math.sin((Math.PI / 2) * (1 - n / STEP)), 2);
+        this.c1 = 0.2 * Math.pow(Math.sin((Math.PI / 2) * (1 - n / STEP)), 2);
     }
 
     public void updateC2(int n){
-        this.c2 = 0.1 * Math.pow(Math.sin((Math.PI * n) / (2 * STEP)), 2);
+        this.c2 = 0.2 * Math.pow(Math.sin((Math.PI * n) / (2 * STEP)), 2);
     }
 
 }

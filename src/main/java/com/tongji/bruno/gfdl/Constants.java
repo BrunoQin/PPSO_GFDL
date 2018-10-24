@@ -9,9 +9,12 @@ public class Constants {
     public static final String RESOURCE_PATH = ROOT_PATH + "record/";
     public static final String DATA_PATH = RESOURCE_PATH + "data/";
 
-    public static final int CONSTRAINT = 500;
-    public static final int YEAR = 300;
+    public static final int SWARM_COUNT = 60;
+    public static final int MODEL_COUNT = 10;
     public static final int PCA_COUNT = 165;
+    public static final int CONSTRAINT = 500;
+    public static final double SPEED_RADIO = 0.02;
+    public static final int YEAR = 300;
     public static final int STEP = 20;
     public static final int START_MONTH = 0;
     public static final int ROW = 756000;
@@ -27,6 +30,5 @@ public class Constants {
     public static final int ADA_MINLAT = 62;
     public static final int ADA_MAXLAT = 130;
     public static final int ADA_MONTH = 11;
-
-
+    
 }
