@@ -17,37 +17,37 @@ import java.util.List;
 public class PCA {
 
     private static final int YEAR = Constants.YEAR;
-    private static final String filename = Constants.DATA_PATH + "u.txt";
+    private static final String filename = Constants.DATA_PATH + Constants.PCA_U;
 
     private SingularValueDecomposition leftU;
 
     double[][] pca = new double[Constants.PCA_COUNT][Constants.ROW];  //读取出的数组
 
-//    public PCA(){
-//
-//        List<FileHelper> fileHelperList = new ArrayList<FileHelper>();
-//        List<double[][][]> averageList = new ArrayList<double[][][]>();
-//
-//        for(int i = 0; i < YEAR; i++){
-//            System.out.print(i + " begin!");
-//            FileHelper fileHelper =  new FileHelper(i * 12);
-//            fileHelperList.add(fileHelper);
-//        }
-//
-//        for(int i = 0; i < YEAR; i++){
-//            double[][][] average;
-//            average = CalculateHelper.toNormalArray(fileHelperList.get(i).getSingleMonthArray().reduce());
-//
-//            averageList.add(average);
-//        }
-//
-//        this.leftU = CalculateHelper.compose(averageList, YEAR);
-//
-//    }
-//
-//    public SingularValueDecomposition getLeftU() {
-//        return leftU;
-//    }
+    public PCA(){
+
+        List<FileHelper> fileHelperList = new ArrayList<FileHelper>();
+        List<double[][][]> averageList = new ArrayList<double[][][]>();
+
+        for(int i = 0; i < YEAR; i++){
+            System.out.print(i + " begin!");
+            FileHelper fileHelper =  new FileHelper(i);
+            fileHelperList.add(fileHelper);
+        }
+
+        for(int i = 0; i < YEAR; i++){
+            double[][][] average;
+            average = CalculateHelper.toNormalArray(fileHelperList.get(i).getSingleMonthArray().reduce());
+
+            averageList.add(average);
+        }
+
+        this.leftU = CalculateHelper.compose(averageList, YEAR);
+
+    }
+
+    public SingularValueDecomposition getLeftU() {
+        return leftU;
+    }
 
     public double[][] getPCA(){
         File file = new File(filename);  //存放数组数据的文件

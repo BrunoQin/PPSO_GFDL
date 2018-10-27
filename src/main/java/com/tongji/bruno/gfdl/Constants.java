@@ -30,5 +30,15 @@ public class Constants {
     public static final int ADA_MINLAT = 62;
     public static final int ADA_MAXLAT = 130;
     public static final int ADA_MONTH = 11;
+
+    public static final String PCA_PATH = "/BIGDATA1/iocas_mmu_2/GFDL-CM2p1/output/ta400Y_Lev21.nc";
+    public static final String PCA_PARAMETER = "ta_jan";
+    public static final int PCA_MINLON = 0;
+    public static final int PCA_MAXLON = 160;
+    public static final int PCA_MINLAT = 20;
+    public static final int PCA_MAXLAT = 170;
+    public static final int PCA_LEVEL = 10;
+    public static final String PCA_U = "u.cp.txt";
+    public static final String PCA_S = "s.cp.txt";
     
 }
