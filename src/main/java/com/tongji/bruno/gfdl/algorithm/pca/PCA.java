@@ -18,12 +18,9 @@ public class PCA {
 
     private static final int YEAR = Constants.YEAR;
     private static final String filename = Constants.DATA_PATH + Constants.PCA_U;
+    private double[][] pca = new double[Constants.PCA_COUNT][Constants.ROW];  //读取出的数组
 
-    private SingularValueDecomposition leftU;
-
-    double[][] pca = new double[Constants.PCA_COUNT][Constants.ROW];  //读取出的数组
-
-    public PCA(){
+    public SingularValueDecomposition processPCA(){
 
         List<FileHelper> fileHelperList = new ArrayList<FileHelper>();
         List<double[][][]> averageList = new ArrayList<double[][][]>();
@@ -41,12 +38,7 @@ public class PCA {
             averageList.add(average);
         }
 
-        this.leftU = CalculateHelper.compose(averageList, YEAR);
-
-    }
-
-    public SingularValueDecomposition getLeftU() {
-        return leftU;
+        return CalculateHelper.compose(averageList, YEAR);
     }
 
     public double[][] getPCA(){

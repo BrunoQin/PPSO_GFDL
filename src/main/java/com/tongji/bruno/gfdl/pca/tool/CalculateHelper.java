@@ -12,19 +12,6 @@ import java.util.List;
  */
 public class CalculateHelper {
 
-//    public static double[][] calAverage(List<Array> monthArrays){
-//        int[] shape = monthArrays.get(0).reduce().getShape();
-//        double[][] sum = new double[shape[0]][shape[1]];
-//        Matrix sumMatrix = new Matrix(sum);
-//        for(int i = 0; i < monthArrays.size(); i++){
-//            Matrix subMatrix = new Matrix(toNormalArray(monthArrays.get(i)));
-//            sumMatrix = sumMatrix.plus(subMatrix);
-//        }
-//        sumMatrix = sumMatrix.times((double)1/monthArrays.size());
-//        sum = sumMatrix.getArray();
-//        return sum;
-//    }
-
     public static SingularValueDecomposition compose(List<double[][][]> averageList, int year){
         int depth = averageList.get(0).length;
         int row = averageList.get(0)[0].length;
