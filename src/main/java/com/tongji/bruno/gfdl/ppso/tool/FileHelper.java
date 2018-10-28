@@ -19,8 +19,6 @@ import java.util.List;
 public class FileHelper {
 
     private static final String fileName = Constants.DATA_PATH + "ocean_temp_salt.res.nc";
-    private static final String STARDARD_FILENAME = Constants.DATA_PATH + "63.nc";
-    private static final String STD_FILENAME = Constants.DATA_PATH + "std_EP.nc";
     private static final String PARAMETER = "temp";
 
     /**
@@ -81,7 +79,7 @@ public class FileHelper {
     public static double[][][] getSigma(){
         double[][][] sigma = new double[Constants.PER_HIGHT][Constants.PER_ROW][Constants.PER_COL];
         try {
-            NetcdfFile ncfile = NetcdfDataset.open(STD_FILENAME);
+            NetcdfFile ncfile = NetcdfDataset.open(Constants.STD_FILENAME);
 
             Variable sst = ncfile.findVariable("std");
             Array part = sst.read("0:" + (Constants.PER_HIGHT - 1) + ":1, 0:" + (Constants.PER_ROW - 1) + ":1, 0:" + (Constants.PER_COL - 1) + ":1");
@@ -97,7 +95,7 @@ public class FileHelper {
 
     public static double[] getLat(){
         try{
-            NetcdfFile ncfile = NetcdfFile.open(STARDARD_FILENAME);
+            NetcdfFile ncfile = NetcdfFile.open(Constants.STARDARD_FILENAME);
             Variable lat = ncfile.findVariable("yt_ocean");
             double[] tem = (double[]) lat.read().copyToNDJavaArray();
             return tem;
@@ -110,7 +108,7 @@ public class FileHelper {
     public static List<Matrix> readStandardFile(){
         try{
             List<Matrix> sst_ave = new ArrayList<>();
-            NetcdfFile ncfile = NetcdfFile.open(STARDARD_FILENAME);
+            NetcdfFile ncfile = NetcdfFile.open(Constants.STARDARD_FILENAME);
 
             for(int p = 0; p < 12; p++){
                 Variable sst = ncfile.findVariable("sst");
