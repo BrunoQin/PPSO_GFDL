@@ -19,7 +19,7 @@ import java.util.List;
 public class FileHelper {
 
     private static final String fileName = Constants.DATA_PATH + "ocean_temp_salt.res.nc";
-    private static final String RESTART_FILENAME = Constants.DATA_PATH + "63.nc";
+    private static final String STARDARD_FILENAME = Constants.DATA_PATH + "63.nc";
     private static final String STD_FILENAME = Constants.DATA_PATH + "std_EP.nc";
     private static final String PARAMETER = "temp";
 
@@ -46,9 +46,14 @@ public class FileHelper {
             for(int k = 0; k < 50; k++){
                 for(int i = 0; i < 200; i++){
                     for(int j = 0; j < 360; j++){
-                        Array tem = varBean_o.read("0:0:1, "+ k + ":" + k + ":1, " + i + ":" + i + ":1, " + j + ":" + j + ":1");
-                        if(k < Constants.PER_LEVEL && i >= Constants.PER_MINLAT && i < Constants.PER_MAXLAT && j >= Constants.PER_MINLON && j < Constants.PER_MAXLON && varBean_o.read("0:0:1, " + "11:11:1, " + i + ":" + i + ":1, " + j + ":" + j + ":1").getDouble(0) <= 9E36 && varBean_o.read("0:0:1, " + "11:11:1, " + i + ":" + i + ":1, " + j + ":" + j + ":1").getDouble(0) > -1E20){
-                            double ssta = swarm.get(k * 200 * 180 + (j - Constants.PER_MINLON) * 200 + i, 0);
+                        Array tem = varBean_o.read(Constants.START_MONTH + ":" + Constants.START_MONTH+ ":1, "+ k + ":" + k + ":1, " + i + ":" + i + ":1, " + j + ":" + j + ":1");
+                        double island = varBean_o.read(Constants.START_MONTH + ":" + Constants.START_MONTH+ ":1, " + (Constants.PER_LEVEL + 1) + ":" + (Constants.PER_LEVEL + 1) + ":1, " + i + ":" + i + ":1, " + j + ":" + j + ":1").getDouble(0);
+                        if(k <= Constants.PER_LEVEL &&
+                                i >= Constants.PER_MINLAT && i <= Constants.PER_MAXLAT &&       // 包含两侧边界
+                                j >= Constants.PER_MINLON && j <= Constants.PER_MAXLON &&       // 包含两侧边界
+                                island < 9E36 &&
+                                island > -1E20){
+                            double ssta = swarm.get(k * Constants.PER_ROW * Constants.PER_COL + (j - Constants.PER_MINLON) * Constants.PER_ROW + (i - Constants.PER_MINLAT), 0);
                             sstaArray.set(index.set(0, k, i, j), tem.getDouble(0) + ssta);
                         } else {
                             sstaArray.set(index.set(0, k, i, j), tem.getDouble(0));
@@ -73,20 +78,18 @@ public class FileHelper {
         }
     }
 
-
     public static double[][][] getSigma(){
-        double[][][] sigma = new double[21][200][120];
+        double[][][] sigma = new double[Constants.PER_HIGHT][Constants.PER_ROW][Constants.PER_COL];
         try {
             NetcdfFile ncfile = NetcdfDataset.open(STD_FILENAME);
 
             Variable sst = ncfile.findVariable("std");
-            Array part = sst.read("0:" + (Constants.PER_LEVEL - 1) + ":1, 0:" + (Constants.PER_MAXLAT - Constants.PER_MINLAT - 1) + ":1, 0:" + (Constants.PER_MAXLON - Constants.PER_MINLON - 1) + ":1");
+            Array part = sst.read("0:" + (Constants.PER_HIGHT - 1) + ":1, 0:" + (Constants.PER_ROW - 1) + ":1, 0:" + (Constants.PER_COL - 1) + ":1");
             sigma = CalculateHelper.toNormalArray(part);
 
         } catch (Exception e){
             e.printStackTrace();
         }
-
 
         return sigma;
 
@@ -94,7 +97,7 @@ public class FileHelper {
 
     public static double[] getLat(){
         try{
-            NetcdfFile ncfile = NetcdfFile.open(RESTART_FILENAME);
+            NetcdfFile ncfile = NetcdfFile.open(STARDARD_FILENAME);
             Variable lat = ncfile.findVariable("yt_ocean");
             double[] tem = (double[]) lat.read().copyToNDJavaArray();
             return tem;
@@ -104,10 +107,10 @@ public class FileHelper {
         }
     }
 
-    public static List<Matrix> readRestartFile(){
+    public static List<Matrix> readStandardFile(){
         try{
             List<Matrix> sst_ave = new ArrayList<>();
-            NetcdfFile ncfile = NetcdfFile.open(RESTART_FILENAME);
+            NetcdfFile ncfile = NetcdfFile.open(STARDARD_FILENAME);
 
             for(int p = 0; p < 12; p++){
                 Variable sst = ncfile.findVariable("sst");
@@ -116,8 +119,7 @@ public class FileHelper {
                 Index index = part.reduce().getIndex();
                 for(int i = 0; i < 200; i++){
                     for(int j = 0; j < 360; j++){
-                        //读取数据
-                        if(part.reduce().getDouble(index.set(i, j)) >= 9E36 || part.reduce().getDouble(index.set(i, j)) <= -1E20){
+                        if(part.reduce().getDouble(index.set(i, j)) > 9E36 || part.reduce().getDouble(index.set(i, j)) < -1E20){
                             temp[i][j] = 0;
                         } else {
                             temp[i][j] = part.reduce().getDouble(index.set(i, j));
@@ -134,7 +136,7 @@ public class FileHelper {
         }
     }
 
-    public static boolean copyFile(String srcFileName, String destFileName, boolean overlay) {
+    public static boolean copyFile(String srcFileName, String destFileName, boolean overlay){
         File srcFile = new File(srcFileName);
 
         if (!srcFile.exists()) {
@@ -187,8 +189,7 @@ public class FileHelper {
         }
     }
 
-    public static void writeFile(String str, String path)
-    {
+    public static void writeFile(String str, String path){
         try
         {
             File file = new File(path);
@@ -238,7 +239,7 @@ public class FileHelper {
 
     }
 
-    public static boolean deleteFile(String fileName) {
+    public static boolean deleteFile(String fileName){
         File file = new File(fileName);
 
         if (file.exists() && file.isFile()) {
@@ -255,7 +256,7 @@ public class FileHelper {
         }
     }
 
-    public static boolean deleteDirectory(String sPath) {
+    public static boolean deleteDirectory(String sPath){
 
         if (!sPath.endsWith(File.separator)) {
             sPath = sPath + File.separator;
@@ -287,7 +288,7 @@ public class FileHelper {
         }
     }
 
-    public static boolean createDir(String destDirName) {
+    public static boolean createDir(String destDirName){
         File dir = new File(destDirName);
         if (dir.exists()) {
             System.out.println("exist!");
@@ -322,7 +323,7 @@ public class FileHelper {
         return Math.sqrt(sum / array.length);
     }
 
-    public static String getOceanOutputFileName(int order) {
+    public static String getOceanOutputFileName(int order){
         String path = Constants.ROOT_PATH + order + "/CM2.1p1/history/"; // 路径
         File f = new File(path);
         if (!f.exists()) {
@@ -340,7 +341,7 @@ public class FileHelper {
         return null;
     }
 
-    public static String getAtmosOutputFileName(int order) {
+    public static String getAtmosOutputFileName(int order){
         String path = Constants.ROOT_PATH + order + "/CM2.1p1/history/"; // 路径
         File f = new File(path);
         if (!f.exists()) {

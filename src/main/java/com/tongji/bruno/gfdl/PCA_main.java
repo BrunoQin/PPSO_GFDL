@@ -29,9 +29,6 @@ public class PCA_main {
             double num = s.get(o, o);
             FileHelper.writeFile(Double.toString(num), Constants.RESOURCE_PATH + Constants.PCA_S);
             sum += num;
-            if(o % 100 == 0){
-                System.out.println(o);
-            }
         }
         System.out.println(sum);
         int row_u = u.getRowDimension();
@@ -56,6 +53,5 @@ public class PCA_main {
         }
 
     }
-
 
 }

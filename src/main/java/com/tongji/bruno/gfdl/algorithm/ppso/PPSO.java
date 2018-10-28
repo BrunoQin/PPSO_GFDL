@@ -4,7 +4,6 @@ import Jama.Matrix;
 import com.tongji.bruno.gfdl.Constants;
 import com.tongji.bruno.gfdl.ppso.tool.FileHelper;
 import com.tongji.bruno.gfdl.ppso.tool.ShellHelper;
-import com.tongji.bruno.gfdl.ppso.tool.ShellThreadHelper;
 import ucar.ma2.Array;
 import ucar.ma2.Index;
 import ucar.nc2.NetcdfFile;
@@ -28,7 +27,7 @@ public class PPSO {
 
     private Matrix lambdaMatrix; //主成分
 
-    private List<Matrix> outputMatrix; //平均态
+    private List<Matrix> standardMatrix; //标准输出
 
     private int swarmCount; //粒子数量
     private int modelCount; //模式数量
@@ -49,8 +48,8 @@ public class PPSO {
         this.swarmCount = swarmCount;
         this.modelCount = modelCount;
         this.lambdaMatrix = lambdaMatrix;
-        this.outputMatrix = FileHelper.readRestartFile();
 
+        this.standardMatrix = FileHelper.readStandardFile();
         this.lat = FileHelper.getLat();
         this.sigma = FileHelper.getSigma();
     }
@@ -79,25 +78,19 @@ public class PPSO {
     }
 
     public double isLegal(int num){
-        double[][] tem = new double[PCACOUNT][1];
-        for(int j = 0; j < PCACOUNT; j++){
-            tem[j][0] = this.swarmMatrices.get(num).get(j, 0);
-        }
-        Matrix p = new Matrix(tem);
+        Matrix p = this.swarmMatrices.get(num);
         p = lambdaMatrix.times(p);
         double sum = 0.0;
-        for(int i = 0; i < 21; i++){
-            for(int j = 0; j < 200; j++){
-                for(int k = 0; k < 180; k++){
-                    if(i < Constants.PER_LEVEL && j >= Constants.PER_MINLAT && j < Constants.PER_MAXLAT && k < Constants.PER_MAXLON - 40 && k > Constants.PER_MINLON - 40){
-                        if(this.sigma[i][j - Constants.PER_MINLAT][k] != 0)
-                        sum += Math.pow(Math.cos(this.lat[j]) * p.get(i * 200 * 180 + k * 200 + j, 0) / this.sigma[i][j - Constants.PER_MINLAT][k], 2);
+        for(int i = 0; i < Constants.PER_HIGHT; i++){
+            for(int j = 0; j < Constants.PER_ROW; j++){
+                for(int k = 0; k < Constants.PER_COL; k++){
+                    if(this.sigma[i][j][k] != 0){
+                        sum += Math.pow(Math.cos(this.lat[j + Constants.PER_MINLAT]) * p.get(i * Constants.PER_ROW * Constants.PER_COL + k * Constants.PER_ROW + j, 0) / this.sigma[i][j][k], 2);
                     }
                 }
             }
         }
         return Math.sqrt(sum);
-
     }
 
     public List<Matrix> initV(){
@@ -269,10 +262,10 @@ public class PPSO {
                 double adapt = 0;
                 for(int j = Constants.ADA_MINLAT; j < Constants.ADA_MAXLAT; j++){
                     for(int k = Constants.ADA_MINLON; k < Constants.ADA_MAXLON; k++){
-                        if(part.reduce().getDouble(index.set(j, k)) >= 9E36 || part.reduce().getDouble(index.set(j, k)) <= -1E20) {
-                            adapt += Math.pow(0 - outputMatrix.get(Constants.ADA_MONTH).get(j, k), 2);
+                        if(part.reduce().getDouble(index.set(j, k)) > 9E36 || part.reduce().getDouble(index.set(j, k)) < -1E20) {
+                            adapt += Math.pow(0 - standardMatrix.get(Constants.ADA_MONTH).get(j, k), 2);
                         } else {
-                            adapt += Math.pow(part.reduce().getDouble(index.set(j, k)) - outputMatrix.get(Constants.ADA_MONTH).get(j, k), 2);
+                            adapt += Math.pow(part.reduce().getDouble(index.set(j, k)) - standardMatrix.get(Constants.ADA_MONTH).get(j, k), 2);
                         }
 
                 }
