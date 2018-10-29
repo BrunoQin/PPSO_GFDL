@@ -81,7 +81,7 @@ public class PPSO {
         Matrix p = this.swarmMatrices.get(num);
         p = lambdaMatrix.times(p);
         double sum = 0.0;
-        for(int i = 0; i < Constants.PER_HIGHT; i++){
+        for(int i = 0; i < Constants.PER_HEIGHT; i++){
             for(int j = 0; j < Constants.PER_ROW; j++){
                 for(int k = 0; k < Constants.PER_COL; k++){
                     if(this.sigma[i][j][k] != 0){

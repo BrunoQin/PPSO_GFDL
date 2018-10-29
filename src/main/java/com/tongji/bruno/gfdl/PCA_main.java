@@ -17,6 +17,7 @@ public class PCA_main {
     public static void main(String[] args){
         System.out.println("hello world!");
 
+        //===================主体======================
         PCA pca = new PCA();
         SingularValueDecomposition i = pca.processPCA();
         Matrix u = i.getU();
@@ -51,6 +52,7 @@ public class PCA_main {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        //===================主体======================
 
     }
 

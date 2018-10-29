@@ -19,7 +19,7 @@ public class SSIMTest {
 
         SSIMTest ssimTest = new SSIMTest();
         NetcdfFile ncfile = null;
-        List<Matrix> outputMatrix = FileHelper.readRestartFile();
+        List<Matrix> outputMatrix = FileHelper.readStandardFile();
         try {
 
             ncfile = NetcdfFile.open("/Users/macbookpro/Desktop/02810101.ocean_month.nc");
