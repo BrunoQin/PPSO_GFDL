@@ -68,7 +68,7 @@ public class Constants {
     public static final int PER_LEVEL               =   LEVEL;
     public static final int PER_ROW                 =   PER_MAXLAT - PER_MINLAT + 1;
     public static final int PER_COL                 =   PER_MAXLON - PER_MINLON + 1;
-    public static final int PER_HEIGHT               =   PER_LEVEL + 1;
+    public static final int PER_HEIGHT              =   PER_LEVEL + 1;
 
     // 计算适应度值相关参数设置
     public static final int ADA_MINLON              =   CAL_MINLON;
