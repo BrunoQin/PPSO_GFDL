@@ -9,22 +9,26 @@ import java.io.InputStreamReader;
  */
 public class ShellHelper {
 
-    public static String exec(String cmd){
+    public static Boolean exec(String cmd){
         Process process = null;
         try {
             process = Runtime.getRuntime().exec(cmd);
             BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String line = "";
-            String results = "";
+            int i = 0;
             while ((line = input.readLine()) != null) {
-                results += line;
+                if(line.contains("fr21.csh")){
+                    if(line.contains("R")){
+                        return false;
+                    }
+                }
             }
             input.close();
-            return results;
+            return true;
         } catch (Exception e) {
             System.out.println("blank");
             e.printStackTrace();
-            return "error";
+            return false;
         }
 
     }
@@ -40,7 +44,7 @@ public class ShellHelper {
             }
 //            String[] evnp = {};
 //            process = Runtime.getRuntime().exec(cmd, evnp, dir);
-            process = Runtime.getRuntime().exec(new String[]{"/bin/csh", "-c", cmd},null, dir);
+            process = Runtime.getRuntime().exec(new String[]{"/bin/sh", "-c", cmd},null, dir);
             BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String line = "";
             while ((line = input.readLine()) != null) {

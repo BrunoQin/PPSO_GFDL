@@ -15,6 +15,9 @@ buildscript {
 
 repositories {
     mavenCentral()
+    maven{
+        url "http://repo.boundlessgeo.com/main/"
+    }
 }
 
 shadowJar {
@@ -22,14 +25,14 @@ shadowJar {
     classifier = null
     version = null
     dependencies {
-        include(dependency('edu.ucar:netcdf:4.2'))
+        include(dependency('edu.ucar:netcdfAll:4.6.10'))
         include(dependency('gov.nist.math:jama:1.0.3'))
     }
 }
 
 dependencies {
-    // https://mvnrepository.com/artifact/edu.ucar/netcdf
-    compile group: 'edu.ucar', name: 'netcdf', version: '4.2'
+    // https://mvnrepository.com/artifact/edu.ucar/netcdfAll
+    compile group: 'edu.ucar', name: 'netcdfAll', version: '4.6.10'
     // https://mvnrepository.com/artifact/gov.nist.math/jama
     compile group: 'gov.nist.math', name: 'jama', version: '1.0.3'
     testCompile group: 'junit', name: 'junit', version: '4.11'
