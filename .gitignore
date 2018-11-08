@@ -23,7 +23,8 @@ hs_err_pid*
 # intellj
 
 .idea/
-
+*.doc
+*.docx
 
 
 # gradle
