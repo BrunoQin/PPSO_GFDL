@@ -25,7 +25,8 @@ hs_err_pid*
 .idea/
 *.doc
 *.docx
-
+/src/main/resource/*.docx
+/src/main/resource/*.doc
 
 # gradle
 
