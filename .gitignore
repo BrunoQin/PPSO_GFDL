@@ -4,6 +4,9 @@
 ### NC file
 *.nc
 
+### file
+file/**
+
 ### TXT file
 *.txt
 
