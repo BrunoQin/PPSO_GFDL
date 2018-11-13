@@ -65,8 +65,8 @@ public class ConstraintTest {
 
     public void test() {
         try{
-            String newFileName = "/Users/macbookpro/Desktop/ocean_temp_salt_1.nc";
-            String oldFileName = "/Users/macbookpro/Desktop/ocean_temp_salt.res.nc";
+            String newFileName = "/Users/macbookpro/Desktop/13_3_origin.nc";
+            String oldFileName = "/Users/macbookpro/Desktop/ocean_temp_salt.63.nc";
             String stdFileName = "/Users/macbookpro/Desktop/std.ep.nc";
             String latFileName = "/Users/macbookpro/Desktop/167.nc";
             NetcdfFile oldNcfile = NetcdfFile.open(oldFileName);
