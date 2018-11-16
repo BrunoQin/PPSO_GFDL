@@ -41,7 +41,7 @@ public class Constants {
             CAL_MINLAT      =       62;
             CAL_MAXLAT      =       129;
             CAL_MONTH       =       11;
-            MAGNITUDE       =       500;
+            MAGNITUDE       =       270;
         } else {
             System.out.println("ERROR!");
             System.exit(0);

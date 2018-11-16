@@ -11,6 +11,7 @@ import ucar.nc2.Variable;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -222,6 +223,25 @@ public class PPSO {
                         if(fa[w].isFile()){
                             FileHelper.deleteFile(fa[w].getAbsolutePath());
                         }
+                    }
+
+                    // write speed
+                    File file = new File(Constants.RESOURCE_PATH + (id + j) + "_v.txt");  //存放粒子速度的文件
+                    FileWriter out = null;  //文件写入流
+                    try {
+                        out = new FileWriter(file, true);
+                        out.append("step" + i + "swarm" + (id + j) + "---v ");
+                        for(int o = 0; o < this.swarmV.get(id + j).getRowDimension(); o++){
+                            out.append(Double.toString(this.swarmV.get(id + j).get(o, 0)));
+                            out.write("\r\n");
+                        }
+                        out.write("\r\n");
+                        out.write("\r\n");
+                        out.write("\r\n");
+                        out.write("\r\n");
+                        out.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
 
                 }

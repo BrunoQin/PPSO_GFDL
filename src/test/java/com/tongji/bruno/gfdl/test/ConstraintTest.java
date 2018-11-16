@@ -4,9 +4,6 @@ import Jama.Matrix;
 import com.tongji.bruno.gfdl.Constants;
 import com.tongji.bruno.gfdl.pca.tool.CalculateHelper;
 import ucar.ma2.Array;
-import ucar.ma2.ArrayDouble;
-import ucar.ma2.Index;
-import ucar.nc2.Dimension;
 import ucar.nc2.NetcdfFile;
 import ucar.nc2.NetcdfFileWriter;
 import ucar.nc2.Variable;
@@ -75,19 +72,6 @@ public class ConstraintTest {
             this.lat = getLat(latFileName);
             sigma = getSigma(stdFileName);
 
-            Dimension xaxis = newNcfile.getNetcdfFile().getDimensions().get(0);
-            Dimension yaxis = newNcfile.getNetcdfFile().getDimensions().get(1);
-            Dimension zaxis = newNcfile.getNetcdfFile().getDimensions().get(2);
-            Dimension time = newNcfile.getNetcdfFile().getDimensions().get(3);
-
-            System.out.println(xaxis);
-            System.out.println(time);
-            System.out.println(zaxis);
-            System.out.println(yaxis);
-
-            ArrayDouble sstaArray = new ArrayDouble.D4(time.getLength(), zaxis.getLength(), yaxis.getLength(), xaxis.getLength());
-
-            Index index = sstaArray.getIndex();
             Variable varBean_o = oldNcfile.findVariable("temp");
             Variable varBean_n = newNcfile.findVariable("temp");
 
