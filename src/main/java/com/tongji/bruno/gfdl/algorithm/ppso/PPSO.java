@@ -336,7 +336,8 @@ public class PPSO {
     }
 
     public void updateC2(int n){
-        this.c2 = 0.2 * Math.pow(Math.sin((Math.PI * n) / (2 * STEP)), 2);
+//        this.c2 = 0.2 * Math.pow(Math.sin((Math.PI * n) / (2 * STEP)), 2);
+        this.c2 = 0.2 * Math.pow(Math.sin((Math.PI / 2) * (1 - n / STEP)), 2);
     }
 
 }
