@@ -29,7 +29,7 @@ public class Constants {
             CAL_MINLAT      =       62;
             CAL_MAXLAT      =       129;
             CAL_MONTH       =       11;
-            MAGNITUDE       =       500;
+            MAGNITUDE       =       270;
         } else if (EXP_NAME == "ep"){
             MINLON          =       0;
             MAXLON          =       160;
@@ -78,7 +78,7 @@ public class Constants {
     public static final int ADA_MONTH               =   CAL_MONTH;
 
     // 算法主体相关参数设置
-    public static final String STANDARD_FILENAME    =   DATA_PATH + "167.nc";
+    public static final String STANDARD_FILENAME    =   DATA_PATH + "63.nc";
     public static final String STD_FILENAME         =   DATA_PATH + "std." + EXP_NAME + ".nc";
     public static final int SWARM_COUNT             =   100;
     public static final int MODEL_COUNT             =   10;
