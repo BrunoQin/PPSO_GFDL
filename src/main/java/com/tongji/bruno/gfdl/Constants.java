@@ -50,7 +50,10 @@ public class Constants {
 
     // PCA相关参数设置
     public static final String PCA_PATH             =   DATA_PATH + "ta400Y_Lev21.nc";
+    public static final String PCA_NO_NAN_PATH      =   DATA_PATH + "ta_jan_no_nan.nc";
     public static final String PCA_PARAMETER        =   "ta_jan";
+    public static final String PCA_NO_NAN_PARAMETER =   "ta";
+    public static final int PCA_EP_COL              =   280403;
     public static final int YEAR                    =   400;
     public static final int PCA_MINLON              =   MINLON;
     public static final int PCA_MAXLON              =   MAXLON;
