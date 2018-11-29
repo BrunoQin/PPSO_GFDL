@@ -1,6 +1,5 @@
 package com.tongji.bruno.gfdl.test;
 
-import Jama.Matrix;
 import com.tongji.bruno.gfdl.Constants;
 import com.tongji.bruno.gfdl.pca.tool.CalculateHelper;
 import ucar.ma2.Array;
@@ -46,26 +45,12 @@ public class ConstraintTest {
 
     }
 
-    public double isLegal(Matrix p){
-        double sum = 0.0;
-        for(int i = 0; i < Constants.PER_HEIGHT; i++){
-            for(int j = 0; j < Constants.PER_ROW; j++){
-                for(int k = 0; k < Constants.PER_COL; k++){
-                    if(this.sigma[i][j][k] != 0){
-                        sum += Math.pow(Math.cos(this.lat[j + Constants.PER_MINLAT]) * p.get(i * Constants.PER_ROW * Constants.PER_COL + k * Constants.PER_ROW + j, 0) / this.sigma[i][j][k], 2);
-                    }
-                }
-            }
-        }
-        return Math.sqrt(sum);
-    }
-
     public void test() {
         try{
-            String newFileName = "/Users/macbookpro/Desktop/13_3_origin.nc";
-            String oldFileName = "/Users/macbookpro/Desktop/ocean_temp_salt.63.nc";
-            String stdFileName = "/Users/macbookpro/Desktop/std.ep.nc";
-            String latFileName = "/Users/macbookpro/Desktop/167.nc";
+            String newFileName = "/Users/macbookpro/Desktop/" + "ocean_temp_salt_0.nc";
+            String oldFileName = "/Users/macbookpro/Desktop/" + "ocean_temp_salt.res.nc";
+            String stdFileName = "/Users/macbookpro/Desktop/" + "std.ep.nc";
+            String latFileName = "/Users/macbookpro/Desktop/" + "167.nc";
             NetcdfFile oldNcfile = NetcdfFile.open(oldFileName);
             NetcdfFileWriter newNcfile = NetcdfFileWriter.openExisting(newFileName);
 
@@ -77,21 +62,25 @@ public class ConstraintTest {
 
             double [][] p = new double[Constants.ROW][1];
 
-            for(int i = Constants.PER_MINLAT; i < Constants.ADA_MAXLAT; i++){
-                for(int j = Constants.PER_MINLON; j < Constants.PER_MAXLON; j++){
-                    for(int k = 0; k < Constants.PER_LEVEL; k++){
-                        Array tem_n = varBean_n.read("0:0:1, " + k + ":" + k + ":1, " + i + ":" + i + ":1, " + j + ":" + j + ":1");
-                        Array tem_o = varBean_o.read("0:0:1, " + k + ":" + k + ":1, " + i + ":" + i + ":1, " + j + ":" + j + ":1");
-                        double tn =  tem_n.getDouble(0);
-                        double tm =  tem_o.getDouble(0);
-                        p[k * Constants.PER_ROW * Constants.PER_COL + j * Constants.PER_ROW + i][0] = tn - tm;
+            double sum = 0.0;
+            for(int i = Constants.PER_MINLAT; i <= Constants.PER_MAXLAT; i++){
+                for(int j = Constants.PER_MINLON; j <= Constants.PER_MAXLON; j++){
+                    for(int k = 0; k <= Constants.PER_LEVEL; k++){
+                        double island = varBean_o.read(Constants.START_MONTH + ":" + Constants.START_MONTH+ ":1, " + (Constants.PER_LEVEL + 1) + ":" + (Constants.PER_LEVEL + 1) + ":1, " + i + ":" + i + ":1, " + j + ":" + j + ":1").getDouble(0);
+                        if(island < 9E36 && island > -1E20 && this.sigma[k][i-Constants.PER_MINLAT][j-Constants.PER_MINLON] != 0){
+                            Array tem_n = varBean_n.read("0:0:1, " + k + ":" + k + ":1, " + i + ":" + i + ":1, " + j + ":" + j + ":1");
+                            Array tem_o = varBean_o.read("0:0:1, " + k + ":" + k + ":1, " + i + ":" + i + ":1, " + j + ":" + j + ":1");
+                            double tn =  tem_n.getDouble(0);
+                            double tm =  tem_o.getDouble(0);
+                            sum += Math.pow(Math.cos(this.lat[i]) * (tn - tm) / this.sigma[k][i-Constants.PER_MINLAT][j-Constants.PER_MINLON], 2);
+                            System.out.println("sum:" + sum);
+                        }
                     }
                 }
             }
 
-            double islegal = isLegal(new Matrix(p));
+            System.out.println(Math.sqrt(sum));
 
-            System.out.println(islegal);
 
         } catch (Exception e){
             e.printStackTrace();

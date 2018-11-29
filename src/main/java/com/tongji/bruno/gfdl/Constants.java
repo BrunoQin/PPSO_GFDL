@@ -83,12 +83,12 @@ public class Constants {
     // 算法主体相关参数设置
     public static final String STANDARD_FILENAME    =   DATA_PATH + "63.nc";
     public static final String STD_FILENAME         =   DATA_PATH + "std." + EXP_NAME + ".nc";
-    public static final int SWARM_COUNT             =   100;
+    public static final int SWARM_COUNT             =   60;
     public static final int MODEL_COUNT             =   10;
     public static final int PCA_COUNT               =   330;        // 95%
     public static final int CONSTRAINT              =   MAGNITUDE;
-    public static final double SPEED_RADIO          =   0.02;
-    public static final int STEP                    =   20;
+    public static final double SPEED_RADIO          =   0.5;
+    public static final int STEP                    =   30;
     public static final int START_MONTH             =   0;
-    public static final int ROW                     =   PER_HEIGHT * PER_ROW * PER_COL;
+    public static final int ROW                     =   PER_HEIGHT * PER_ROW * PER_COL;     //用来将三维数据转换成一维的数据，维度就变成了深度乘以纬度乘以经度
 }
