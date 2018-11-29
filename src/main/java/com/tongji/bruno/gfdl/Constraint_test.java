@@ -1,17 +1,15 @@
-package com.tongji.bruno.gfdl.test;
+package com.tongji.bruno.gfdl;
 
-import com.tongji.bruno.gfdl.Constants;
 import com.tongji.bruno.gfdl.pca.tool.CalculateHelper;
 import ucar.ma2.Array;
 import ucar.nc2.NetcdfFile;
-import ucar.nc2.NetcdfFileWriter;
 import ucar.nc2.Variable;
 import ucar.nc2.dataset.NetcdfDataset;
 
 /**
  * Created by 秦博 on 2017/10/30.
  */
-public class ConstraintTest {
+public class Constraint_test {
 
     double[] lat;
     double[][][] sigma;
@@ -47,12 +45,12 @@ public class ConstraintTest {
 
     public void test() {
         try{
-            String newFileName = "/Users/macbookpro/Desktop/" + "ocean_temp_salt_0.nc";
-            String oldFileName = "/Users/macbookpro/Desktop/" + "ocean_temp_salt.res.nc";
-            String stdFileName = "/Users/macbookpro/Desktop/" + "std.ep.nc";
-            String latFileName = "/Users/macbookpro/Desktop/" + "167.nc";
+            String newFileName = Constants.DATA_PATH + "temp.nc";
+            String oldFileName = Constants.DATA_PATH + "ocean_temp_salt.res.nc";
+            String stdFileName = Constants.DATA_PATH + "std.ep.nc";
+            String latFileName = Constants.DATA_PATH + "167.nc";
             NetcdfFile oldNcfile = NetcdfFile.open(oldFileName);
-            NetcdfFileWriter newNcfile = NetcdfFileWriter.openExisting(newFileName);
+            NetcdfFile newNcfile = NetcdfFile.open(newFileName);
 
             this.lat = getLat(latFileName);
             sigma = getSigma(stdFileName);
@@ -81,14 +79,13 @@ public class ConstraintTest {
 
             System.out.println(Math.sqrt(sum));
 
-
         } catch (Exception e){
             e.printStackTrace();
         }
     }
 
     public static void main(String[] args) {
-        new ConstraintTest().test();
+        new Constraint_test().test();
     }
 
 }

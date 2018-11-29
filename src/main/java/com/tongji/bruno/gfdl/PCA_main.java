@@ -19,8 +19,8 @@ public class PCA_main {
 
         //===================主体======================
         PCA pca = new PCA();
-//        SingularValueDecomposition i = pca.processPCA();
-        SingularValueDecomposition i = pca._processPCA();
+        SingularValueDecomposition i = pca.processPCA();
+//        SingularValueDecomposition i = pca._processPCA();
         Matrix u = i.getU();
         Matrix s = i.getS();
         int row_s = s.getRowDimension();
