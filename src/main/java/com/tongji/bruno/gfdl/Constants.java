@@ -83,6 +83,8 @@ public class Constants {
     // 算法主体相关参数设置
     public static final String STANDARD_FILENAME    =   DATA_PATH + "63.nc";
     public static final String STD_FILENAME         =   DATA_PATH + "std." + EXP_NAME + ".nc";
+    public static final String BASE_FILENAME        =   DATA_PATH + "ocean_temp_salt.res.nc";
+    public static final String PSO_PARAMETER        =   "temp";
     public static final int SWARM_COUNT             =   60;
     public static final int MODEL_COUNT             =   10;
     public static final int PCA_COUNT               =   330;        // 95%
@@ -91,4 +93,15 @@ public class Constants {
     public static final int STEP                    =   30;
     public static final int START_MONTH             =   0;
     public static final int ROW                     =   PER_HEIGHT * PER_ROW * PER_COL;     //用来将三维数据转换成一维的数据，维度就变成了深度乘以纬度乘以经度
+
+    // 计算约束参数设置
+    public static final String TEST_FILENAME        =   DATA_PATH + "ocean_temp_salt_0.nc";
+
+    // 添加随机扰动参数设置
+    public static final String CNOP_FILENAME        =   DATA_PATH + "1_34_origin.nc";
+    public static final int COUNT                   =   50;
+    public static final int GAUSSIAN_MEAN           =   0;
+    public static final double GAUSSIAN_VAR         =   0.3;
+
+
 }

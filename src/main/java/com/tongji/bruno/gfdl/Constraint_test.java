@@ -45,18 +45,18 @@ public class Constraint_test {
 
     public void test() {
         try{
-            String newFileName = Constants.DATA_PATH + "temp.nc";
-            String oldFileName = Constants.DATA_PATH + "ocean_temp_salt.res.nc";
-            String stdFileName = Constants.DATA_PATH + "std.ep.nc";
-            String latFileName = Constants.DATA_PATH + "167.nc";
+            String newFileName = Constants.TEST_FILENAME;
+            String oldFileName = Constants.BASE_FILENAME;
+            String stdFileName = Constants.STD_FILENAME;
+            String latFileName = Constants.STANDARD_FILENAME;
             NetcdfFile oldNcfile = NetcdfFile.open(oldFileName);
             NetcdfFile newNcfile = NetcdfFile.open(newFileName);
 
             this.lat = getLat(latFileName);
             sigma = getSigma(stdFileName);
 
-            Variable varBean_o = oldNcfile.findVariable("temp");
-            Variable varBean_n = newNcfile.findVariable("temp");
+            Variable varBean_o = oldNcfile.findVariable(Constants.PSO_PARAMETER);
+            Variable varBean_n = newNcfile.findVariable(Constants.PSO_PARAMETER);
 
             double [][] p = new double[Constants.ROW][1];
 
@@ -71,7 +71,6 @@ public class Constraint_test {
                             double tn =  tem_n.getDouble(0);
                             double tm =  tem_o.getDouble(0);
                             sum += Math.pow(Math.cos(this.lat[i]) * (tn - tm) / this.sigma[k][i-Constants.PER_MINLAT][j-Constants.PER_MINLON], 2);
-                            System.out.println("sum:" + sum);
                         }
                     }
                 }

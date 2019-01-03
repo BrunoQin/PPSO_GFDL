@@ -18,9 +18,6 @@ import java.util.List;
  */
 public class FileHelper {
 
-    private static final String fileName = Constants.DATA_PATH + "ocean_temp_salt.res.nc";
-    private static final String PARAMETER = "temp";
-
     /**
      * 将原文件拷贝成新文件，并将粒子矩阵写回新文件
      * @param order
@@ -31,8 +28,8 @@ public class FileHelper {
         try{
 
             String orderFileName = Constants.RESOURCE_PATH + order + "/ocean_temp_salt_" + order + ".nc";
-            copyFile(fileName, orderFileName, true);
-            NetcdfFile oldNcfile = NetcdfFile.open(fileName);
+            copyFile(Constants.BASE_FILENAME, orderFileName, true);
+            NetcdfFile oldNcfile = NetcdfFile.open(Constants.BASE_FILENAME);
 
             Dimension xaxis = oldNcfile.getDimensions().get(0);
             Dimension time = oldNcfile.getDimensions().get(1);
@@ -40,7 +37,7 @@ public class FileHelper {
             Dimension yaxis = oldNcfile.getDimensions().get(3);
             ArrayDouble sstaArray = new ArrayDouble.D4(time.getLength(), zaxis.getLength(), yaxis.getLength(), xaxis.getLength());
             Index index = sstaArray.getIndex();
-            Variable varBean_o = oldNcfile.findVariable(PARAMETER);
+            Variable varBean_o = oldNcfile.findVariable(Constants.PSO_PARAMETER);
             for(int k = 0; k < 50; k++){
                 for(int i = 0; i < 200; i++){
                     for(int j = 0; j < 360; j++){
@@ -62,7 +59,7 @@ public class FileHelper {
             oldNcfile.close();
 
             NetcdfFileWriter ncfile = NetcdfFileWriter.openExisting(orderFileName);
-            Variable varBean = ncfile.findVariable(PARAMETER);
+            Variable varBean = ncfile.findVariable(Constants.PSO_PARAMETER);
 
             System.out.println("start prepare " + orderFileName);
             ncfile.write(varBean, sstaArray);
