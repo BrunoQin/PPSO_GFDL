@@ -226,20 +226,39 @@ public class PPSO {
                     }
 
                     // write speed
-                    File file = new File(Constants.RESOURCE_PATH + (id + j) + "_v.txt");  //存放粒子速度的文件
-                    FileWriter out = null;  //文件写入流
+                    File file_v = new File(Constants.RESOURCE_PATH + (id + j) + "_v.txt");  //存放粒子速度的文件
+                    FileWriter out_v = null;  //文件写入流
                     try {
-                        out = new FileWriter(file, true);
-                        out.append("step" + i + "swarm" + (id + j) + "---v ");
+                        out_v = new FileWriter(file_v, true);
+                        out_v.append("step" + i + "swarm" + (id + j) + "---v ");
                         for(int o = 0; o < this.swarmV.get(id + j).getRowDimension(); o++){
-                            out.append(Double.toString(this.swarmV.get(id + j).get(o, 0)));
-                            out.write("\r\n");
+                            out_v.append(Double.toString(this.swarmV.get(id + j).get(o, 0)));
+                            out_v.write("\r\n");
                         }
-                        out.write("\r\n");
-                        out.write("\r\n");
-                        out.write("\r\n");
-                        out.write("\r\n");
-                        out.close();
+                        out_v.write("\r\n");
+                        out_v.write("\r\n");
+                        out_v.write("\r\n");
+                        out_v.write("\r\n");
+                        out_v.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    // write position
+                    File file_s = new File(Constants.RESOURCE_PATH + (id + j) + "_s.txt");  //存放粒子速度的文件
+                    FileWriter out_s = null;  //文件写入流
+                    try {
+                        out_s = new FileWriter(file_s, true);
+                        out_s.append("step" + i + "swarm" + (id + j) + "---s ");
+                        for(int o = 0; o < this.swarmMatrices.get(id + j).getRowDimension(); o++){
+                            out_s.append(Double.toString(this.swarmMatrices.get(id + j).get(o, 0)));
+                            out_s.write("\r\n");
+                        }
+                        out_s.write("\r\n");
+                        out_s.write("\r\n");
+                        out_s.write("\r\n");
+                        out_s.write("\r\n");
+                        out_s.close();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
