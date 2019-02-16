@@ -128,7 +128,7 @@ public class Confirmation_test {
             NetcdfFile baseFile = NetcdfFile.open(Constants.BASE_FILENAME);
             Variable varBean_b = baseFile.findVariable(Constants.PSO_PARAMETER);
 
-            if (cur > Constants.CONSTRAINT){
+            while (cur > Constants.CONSTRAINT){
                 for(int k = 0; k < 50; k++){
                     for(int i = 0; i < 200; i++){
                         for(int j = 0; j < 360; j++){
@@ -147,6 +147,7 @@ public class Confirmation_test {
                         }
                     }
                 }
+                cur = isLegal(sstaArray);
             }
             oldNcfile.close();
             baseFile.close();
