@@ -6,12 +6,12 @@ package com.tongji.bruno.gfdl;
 public class Constants {
 
     // 实验基础路径设置
-    public static final String ROOT_PATH            =   "/BIGDATA1/iocas_mmu_2/PPSO/";
+    public static final String ROOT_PATH            =   "/BIGDATA1/iocas_mmu_2/PPSO_qin/";
     public static final String RESOURCE_PATH        =   ROOT_PATH + "record/";
     public static final String DATA_PATH            =   RESOURCE_PATH + "data/";
 
     // 实验类型设置(重要)
-    public static final String EXP_NAME             =   "ep";
+    public static final String EXP_NAME             =   "cp";
 
     // 基础实验方案设置
     private static int MINLON, MAXLON, MINLAT, MAXLAT, LEVEL;
@@ -49,9 +49,9 @@ public class Constants {
     }
 
     // PCA相关参数设置
-    public static final String PCA_PATH             =   DATA_PATH + "ta400Y_Lev21.nc";
+    public static final String PCA_PATH             =   DATA_PATH + "ta_july_400Y_Lev21.nc";
     public static final String PCA_NO_NAN_PATH      =   DATA_PATH + "ta_jan_no_nan.nc";
-    public static final String PCA_PARAMETER        =   "ta_jan";
+    public static final String PCA_PARAMETER        =   "ta_july";
     public static final String PCA_NO_NAN_PARAMETER =   "ta";
     public static final int PCA_EP_COL              =   280403;
     public static final int YEAR                    =   400;
@@ -60,8 +60,8 @@ public class Constants {
     public static final int PCA_MINLAT              =   MINLAT;
     public static final int PCA_MAXLAT              =   MAXLAT;
     public static final int PCA_LEVEL               =   LEVEL;
-    public static final String PCA_U                =   "u." + EXP_NAME + ".txt";
-    public static final String PCA_S                =   "s." + EXP_NAME + ".txt";
+    public static final String PCA_U                =   "u.july." + EXP_NAME + ".txt";
+    public static final String PCA_S                =   "s.july." + EXP_NAME + ".txt";
 
     // 添加扰动相关参数设置
     public static final int PER_MINLON              =   MINLON + 40;

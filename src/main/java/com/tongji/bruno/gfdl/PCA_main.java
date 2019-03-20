@@ -29,7 +29,7 @@ public class PCA_main {
         double sum = 0;
         for(int o = 0; o < row_s; o++){
             double num = s.get(o, o);
-            FileHelper.writeFile(Double.toString(num), Constants.RESOURCE_PATH + Constants.PCA_S);
+            FileHelper.writeFile(Double.toString(num), Constants.DATA_PATH + Constants.PCA_S);
             sum += num;
         }
         System.out.println(sum);
@@ -39,7 +39,7 @@ public class PCA_main {
         System.out.println(col_u);
         Matrix lambdaMatrix = new Matrix(row_u, col_u);
         lambdaMatrix.setMatrix(0, row_u - 1, 0, col_u - 1, u.getMatrix(0, row_u - 1, 0, col_u - 1));
-        File file = new File(Constants.RESOURCE_PATH + Constants.PCA_U);  //存放数组数据的文件
+        File file = new File(Constants.DATA_PATH + Constants.PCA_U);  //存放数组数据的文件
         FileWriter out = null;  //文件写入流
         try {
             out = new FileWriter(file);
