@@ -82,8 +82,10 @@ public class Constants {
     public static final int ADA_MONTH               =   CAL_MONTH;
 
     // 算法主体相关参数设置
+    public static final String SHELL_NAME           =   "frSD.csh";
     public static final String STANDARD_FILENAME    =   DATA_PATH + "426.6.nc";
     public static final String STD_FILENAME         =   DATA_PATH + "std_july_" + EXP_NAME + ".nc";
+    public static final String STD_PARAMETER        =   "std_july";
     public static final String BASE_FILENAME        =   DATA_PATH + "ocean_temp_salt.res.nc";
     public static final String PSO_PARAMETER        =   "temp";
     public static final int SWARM_COUNT             =   30;

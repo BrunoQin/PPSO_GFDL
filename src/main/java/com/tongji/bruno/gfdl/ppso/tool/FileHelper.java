@@ -78,7 +78,7 @@ public class FileHelper {
         try {
             NetcdfFile ncfile = NetcdfDataset.open(Constants.STD_FILENAME);
 
-            Variable sst = ncfile.findVariable("std");
+            Variable sst = ncfile.findVariable(Constants.STD_PARAMETER);
             Array part = sst.read("0:" + (Constants.PER_HEIGHT - 1) + ":1, 0:" + (Constants.PER_ROW - 1) + ":1, 0:" + (Constants.PER_COL - 1) + ":1");
             sigma = CalculateHelper.toNormalArray(part);
 

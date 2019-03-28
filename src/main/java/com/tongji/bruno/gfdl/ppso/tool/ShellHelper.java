@@ -1,5 +1,7 @@
 package com.tongji.bruno.gfdl.ppso.tool;
 
+import com.tongji.bruno.gfdl.Constants;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
@@ -17,7 +19,7 @@ public class ShellHelper {
             String line = "";
             int i = 0;
             while ((line = input.readLine()) != null) {
-                if(line.contains("fr21.csh")){
+                if(line.contains(Constants.SHELL_NAME)){
                     if(line.contains("R")){
                         return false;
                     }
