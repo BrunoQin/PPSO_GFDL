@@ -28,7 +28,7 @@ public class PPSO {
 
     private Matrix lambdaMatrix; //主成分
 
-    private List<Matrix> standardMatrix; //标准输出
+    private Matrix standardMatrix; //标准输出
 
     private int swarmCount; //粒子数量
     private int modelCount; //模式数量
@@ -303,9 +303,9 @@ public class PPSO {
                 for(int j = Constants.ADA_MINLAT; j < Constants.ADA_MAXLAT; j++){
                     for(int k = Constants.ADA_MINLON; k < Constants.ADA_MAXLON; k++){
                         if(part.reduce().getDouble(index.set(j, k)) > 9E36 || part.reduce().getDouble(index.set(j, k)) < -1E20) {
-                            adapt += Math.pow(0 - standardMatrix.get(Constants.ADA_MONTH).get(j, k), 2);
+                            adapt += Math.pow(0 - standardMatrix.get(j, k), 2);
                         } else {
-                            adapt += Math.pow(part.reduce().getDouble(index.set(j, k)) - standardMatrix.get(Constants.ADA_MONTH).get(j, k), 2);
+                            adapt += Math.pow(part.reduce().getDouble(index.set(j, k)) - standardMatrix.get(j, k), 2);
                         }
 
                 }

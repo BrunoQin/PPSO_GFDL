@@ -12,6 +12,7 @@ public class Constants {
 
     // 实验类型设置(重要)
     public static final String EXP_NAME             =   "cp";
+    public static final int MONTH                   =   7;
 
     // 基础实验方案设置
     private static int MINLON, MAXLON, MINLAT, MAXLAT, LEVEL;
@@ -81,11 +82,11 @@ public class Constants {
     public static final int ADA_MONTH               =   CAL_MONTH;
 
     // 算法主体相关参数设置
-    public static final String STANDARD_FILENAME    =   DATA_PATH + "63.nc";
-    public static final String STD_FILENAME         =   DATA_PATH + "std." + EXP_NAME + ".nc";
+    public static final String STANDARD_FILENAME    =   DATA_PATH + "426.6.nc";
+    public static final String STD_FILENAME         =   DATA_PATH + "std_july_" + EXP_NAME + ".nc";
     public static final String BASE_FILENAME        =   DATA_PATH + "ocean_temp_salt.res.nc";
     public static final String PSO_PARAMETER        =   "temp";
-    public static final int SWARM_COUNT             =   60;
+    public static final int SWARM_COUNT             =   30;
     public static final int MODEL_COUNT             =   10;
     public static final int PCA_COUNT               =   330;        // 95%
     public static final int CONSTRAINT              =   MAGNITUDE;

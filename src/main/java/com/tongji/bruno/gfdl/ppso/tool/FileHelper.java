@@ -102,29 +102,54 @@ public class FileHelper {
         }
     }
 
-    public static List<Matrix> readStandardFile(){
+//    public static List<Matrix> readStandardFile(){
+//        try{
+//            List<Matrix> sst_ave = new ArrayList<>();
+//            NetcdfFile ncfile = NetcdfFile.open(Constants.STANDARD_FILENAME);
+//
+//            for(int p = 0; p < 12; p++){
+//                Variable sst = ncfile.findVariable("sst");
+//                Array part = sst.read(p + ":" + p + ":1, 0:199:1, 0:359:1");
+//                double[][] temp = new double[200][360];
+//                Index index = part.reduce().getIndex();
+//                for(int i = 0; i < 200; i++){
+//                    for(int j = 0; j < 360; j++){
+//                        if(part.reduce().getDouble(index.set(i, j)) > 9E36 || part.reduce().getDouble(index.set(i, j)) < -1E20){
+//                            temp[i][j] = 0;
+//                        } else {
+//                            temp[i][j] = part.reduce().getDouble(index.set(i, j));
+//                        }
+//                    }
+//                }
+//                sst_ave.add(new Matrix(temp));
+//            }
+//            ncfile.close();
+//            return sst_ave;
+//        } catch (Exception e){
+//            e.printStackTrace();
+//            return null;
+//        }
+//    }
+
+    public static Matrix readStandardFile(){
         try{
             List<Matrix> sst_ave = new ArrayList<>();
             NetcdfFile ncfile = NetcdfFile.open(Constants.STANDARD_FILENAME);
 
-            for(int p = 0; p < 12; p++){
-                Variable sst = ncfile.findVariable("sst");
-                Array part = sst.read(p + ":" + p + ":1, 0:199:1, 0:359:1");
-                double[][] temp = new double[200][360];
-                Index index = part.reduce().getIndex();
-                for(int i = 0; i < 200; i++){
-                    for(int j = 0; j < 360; j++){
-                        if(part.reduce().getDouble(index.set(i, j)) > 9E36 || part.reduce().getDouble(index.set(i, j)) < -1E20){
-                            temp[i][j] = 0;
-                        } else {
-                            temp[i][j] = part.reduce().getDouble(index.set(i, j));
-                        }
+            Variable sst = ncfile.findVariable("sst");
+            Array part = sst.read("0:199:1, 0:359:1");
+            double[][] temp = new double[200][360];
+            Index index = part.reduce().getIndex();
+            for(int i = 0; i < 200; i++){
+                for(int j = 0; j < 360; j++){
+                    if(part.reduce().getDouble(index.set(i, j)) > 9E36 || part.reduce().getDouble(index.set(i, j)) < -1E20){
+                        temp[i][j] = 0;
+                    } else {
+                        temp[i][j] = part.reduce().getDouble(index.set(i, j));
                     }
                 }
-                sst_ave.add(new Matrix(temp));
             }
-            ncfile.close();
-            return sst_ave;
+            return new Matrix(temp);
         } catch (Exception e){
             e.printStackTrace();
             return null;
