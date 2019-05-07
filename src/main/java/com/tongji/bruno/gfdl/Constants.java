@@ -12,7 +12,7 @@ public class Constants {
 
     // 实验类型设置(重要)
     public static final String EXP_NAME             =   "cp";
-    public static final int MONTH                   =   4;
+    public static final int MONTH                   =   1;
 
     // 基础实验方案设置
     private static int MINLON, MAXLON, MINLAT, MAXLAT, LEVEL;
@@ -50,9 +50,9 @@ public class Constants {
     }
 
     // PCA相关参数设置
-    public static final String PCA_PATH             =   DATA_PATH + "ta_apr_400Y_Lev21.nc";
+    public static final String PCA_PATH             =   DATA_PATH + "ta_jan_400Y_Lev21.nc";
     public static final String PCA_NO_NAN_PATH      =   DATA_PATH + "ta_jan_no_nan.nc";
-    public static final String PCA_PARAMETER        =   "ta_apr";
+    public static final String PCA_PARAMETER        =   "ta_jan";
     public static final String PCA_NO_NAN_PARAMETER =   "ta";
     public static final int PCA_EP_COL              =   280403;
     public static final int YEAR                    =   400;
@@ -61,8 +61,8 @@ public class Constants {
     public static final int PCA_MINLAT              =   MINLAT;
     public static final int PCA_MAXLAT              =   MAXLAT;
     public static final int PCA_LEVEL               =   LEVEL;
-    public static final String PCA_U                =   "u.apr." + EXP_NAME + ".txt";
-    public static final String PCA_S                =   "s.apr." + EXP_NAME + ".txt";
+    public static final String PCA_U                =   "u.jan." + EXP_NAME + ".txt";
+    public static final String PCA_S                =   "s.jan." + EXP_NAME + ".txt";
 
     // 添加扰动相关参数设置
     public static final int PER_MINLON              =   MINLON + 40;
@@ -83,9 +83,9 @@ public class Constants {
 
     // 算法主体相关参数设置
     public static final String SHELL_NAME           =   "frSD.csh";
-    public static final String STANDARD_FILENAME    =   DATA_PATH + "427.3.nc";
-    public static final String STD_FILENAME         =   DATA_PATH + "std_apr_" + EXP_NAME + ".nc";
-    public static final String STD_PARAMETER        =   "std_apr";
+    public static final String STANDARD_FILENAME    =   DATA_PATH + "426.12.nc";
+    public static final String STD_FILENAME         =   DATA_PATH + "std_jan_" + EXP_NAME + ".nc";
+    public static final String STD_PARAMETER        =   "std";
     public static final String BASE_FILENAME        =   DATA_PATH + "ocean_temp_salt.res.nc";
     public static final String PSO_PARAMETER        =   "temp";
     public static final int SWARM_COUNT             =   30;
