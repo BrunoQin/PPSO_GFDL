@@ -41,13 +41,13 @@ public class Transfer_main {
                                 j >= Constants.PER_MINLON && j <= Constants.PER_MAXLON &&       // 包含两侧边界
                                 island < 9E36 &&
                                 island > -1E20){
-                            double ssta = varBean_per.read(Constants.START_MONTH + ":" + Constants.START_MONTH+ ":1, " + (Constants.PER_LEVEL + 1) + ":" + (Constants.PER_LEVEL + 1) + ":1, " + i + ":" + i + ":1, " + j + ":" + j + ":1").getDouble(0)
-                                    - varBean_old.read(Constants.START_MONTH + ":" + Constants.START_MONTH+ ":1, " + (Constants.PER_LEVEL + 1) + ":" + (Constants.PER_LEVEL + 1) + ":1, " + i + ":" + i + ":1, " + j + ":" + j + ":1").getDouble(0)
-                                    + varBean_new.read(Constants.START_MONTH + ":" + Constants.START_MONTH+ ":1, " + (Constants.PER_LEVEL + 1) + ":" + (Constants.PER_LEVEL + 1) + ":1, " + i + ":" + i + ":1, " + j + ":" + j + ":1").getDouble(0);
+                            double ssta = varBean_per.read(Constants.START_MONTH + ":" + Constants.START_MONTH+ ":1, " + k + ":" + k + ":1, " + i + ":" + i + ":1, " + j + ":" + j + ":1").getDouble(0)
+                                    - varBean_old.read(Constants.START_MONTH + ":" + Constants.START_MONTH+ ":1, " + k + ":" + k + ":1, " + i + ":" + i + ":1, " + j + ":" + j + ":1").getDouble(0)
+                                    + varBean_new.read(Constants.START_MONTH + ":" + Constants.START_MONTH+ ":1, " + k + ":" + k + ":1, " + i + ":" + i + ":1, " + j + ":" + j + ":1").getDouble(0);
 
                             sstaArray.set(index.set(0, k, i, j), ssta);
                         } else {
-                            sstaArray.set(index.set(0, k, i, j), varBean_new.read(Constants.START_MONTH + ":" + Constants.START_MONTH+ ":1, " + (Constants.PER_LEVEL + 1) + ":" + (Constants.PER_LEVEL + 1) + ":1, " + i + ":" + i + ":1, " + j + ":" + j + ":1").getDouble(0));
+                            sstaArray.set(index.set(0, k, i, j), varBean_new.read(Constants.START_MONTH + ":" + Constants.START_MONTH+ ":1, " + k + ":" + k + ":1, " + i + ":" + i + ":1, " + j + ":" + j + ":1").getDouble(0));
                         }
                     }
                 }
